@@ -1,0 +1,107 @@
+@use '../abstracts/tokens' as *;
+
+.game-controls {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(18rem, auto) minmax(8rem, 1fr);
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  align-items: start;
+  padding: clamp(0.8rem, 1.5vw, 1.25rem);
+  border: 1px solid rgba($gold, 0.55);
+  border-top: 0;
+  border-radius: 0 0 0.7rem 0.7rem;
+  background:
+    linear-gradient(90deg, rgba($gold, 0.05), transparent 30% 70%, rgba($gold, 0.05)),
+    rgba(#070a08, 0.96);
+  box-shadow:
+    inset 0 0 0 3px rgba(#000, 0.42),
+    0 0.7rem 1.5rem rgba(#000, 0.36);
+}
+
+.game-controls__side {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  min-height: 3.75rem;
+}
+
+.game-controls__side--left {
+  justify-content: flex-start;
+}
+
+.game-controls__side--right {
+  justify-content: flex-end;
+}
+
+.game-controls__main {
+  display: grid;
+  place-items: center;
+}
+
+.game-controls__start-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-controls__play-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-controls__play-actions .primary-action {
+  min-width: min(13rem, 80vw);
+}
+
+.game-controls__pour-out {
+  border-color: rgba(#ff9f71, 0.8);
+  color: #ffd8bc;
+  background: linear-gradient(180deg, rgba(#5e2e1d, 0.96), rgba(#22110c, 0.98));
+}
+
+.game-controls__side-action {
+  min-width: min(10rem, 100%);
+}
+
+.game-controls__difficulty {
+  margin: 0.55rem 0 0;
+  color: $gold-light;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.game-controls__status {
+  min-height: 1.1rem;
+  margin: 0.55rem 0 0;
+  color: $muted-ink;
+  font-size: 0.85rem;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.game-controls__status--success {
+  color: $magic;
+  font-style: normal;
+  text-shadow: 0 0 0.65rem rgba($magic, 0.45);
+}
+
+.game-controls__status--failure {
+  color: #ff8069;
+  font-style: normal;
+  text-shadow: 0 0 0.55rem rgba(#e33b2c, 0.35);
+}
+
+.game-controls__status--reaction {
+  color: $gold-light;
+  font-style: normal;
+  font-weight: 700;
+  text-shadow: 0 0 0.65rem rgba($gold, 0.55);
+}

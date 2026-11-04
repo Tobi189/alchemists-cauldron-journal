@@ -1,0 +1,260 @@
+@use '../abstracts/tokens' as *;
+
+@media (max-width: 1100px) {
+  .game-board {
+    grid-template-columns: minmax(15rem, 0.85fr) minmax(19rem, 1.15fr);
+  }
+
+  .recipe-panel {
+    grid-column: 1 / -1;
+    width: min(100%, 42rem);
+    min-height: 18rem;
+    justify-self: center;
+    box-shadow:
+      inset 0 0 2.8rem rgba(#56320e, 0.32),
+      0.4rem 0.5rem 0 #3c2913,
+      0.6rem 0.7rem 1.3rem rgba(#000, 0.5);
+  }
+}
+
+@media (max-width: 760px) {
+  .game-header__frame {
+    padding-inline: 0;
+  }
+
+  .game-header__hud {
+    grid-template-areas:
+      'score lives'
+      'timer timer';
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 0;
+  }
+
+  .hud__score {
+    grid-area: score;
+  }
+
+  .hud__timer {
+    grid-area: timer;
+    width: min(88%, 32rem);
+    min-width: 17rem;
+    margin-top: -0.8rem;
+  }
+
+  .hud__lives {
+    grid-area: lives;
+  }
+
+  .game-header__title-group {
+    width: min(96%, 39rem);
+    margin-top: -0.95rem;
+  }
+
+  .game-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ingredient-shelf {
+    order: 2;
+  }
+
+  .ingredient-shelf__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ingredient-card {
+    grid-template-columns: 4rem minmax(0, 1fr) 2.7rem;
+  }
+
+  .ingredient-card__icon {
+    width: 100%;
+  }
+
+  .ingredient-card__stock {
+    width: 1.85rem;
+    font-size: 0.8rem;
+  }
+
+  .cauldron-area {
+    order: 1;
+  }
+
+  .cauldron-stage {
+    min-height: clamp(21rem, 90vw, 31rem);
+  }
+
+  .recipe-panel {
+    order: 3;
+    grid-column: auto;
+  }
+
+  .parameter-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .game-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .game-controls__main {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .game-controls__side {
+    grid-row: 2;
+  }
+
+  .settings-dialog__choices {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .difficulty-card {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 500px) {
+  .game-shell {
+    padding: 0.35rem;
+  }
+
+  .game-header {
+    margin-bottom: 0.65rem;
+  }
+
+  .game-header__frame {
+    padding: 0;
+  }
+
+  .game-header__hud {
+    column-gap: 0;
+  }
+
+  .game-header__title-group {
+    width: 100%;
+    min-height: 4.5rem;
+    padding: 0.65rem 2.15rem 0.95rem;
+    margin-top: -0.8rem;
+  }
+
+  .game-header__title {
+    font-size: clamp(1.18rem, 5.8vw, 1.62rem);
+    letter-spacing: 0.02em;
+  }
+
+  .dialog-overlay {
+    padding: 0.5rem;
+  }
+
+  .game-over-dialog {
+    max-height: calc(100dvh - 1rem);
+    padding: 1.25rem 0.75rem;
+  }
+
+  .leaderboard-table {
+    font-size: 0.7rem;
+
+    th,
+    td {
+      padding: 0.45rem 0.2rem;
+    }
+
+    th {
+      font-size: 0.62rem;
+    }
+  }
+
+  .hud__label {
+    font-size: 0.58rem;
+  }
+
+  .hud__value {
+    font-size: 1rem;
+  }
+
+  .hud__timer {
+    width: 92%;
+    min-width: 0;
+    min-height: 5.4rem;
+    padding: 0.7rem 3rem 0.85rem;
+  }
+
+  .hud__timer-progress {
+    width: calc(100% - 2rem);
+  }
+
+  .hud__score,
+  .hud__lives,
+  .hud__lives--empty {
+    min-height: 4.8rem;
+  }
+
+  .hud__score {
+    grid-template-columns: auto minmax(0, auto);
+    gap: 0.2rem 0.35rem;
+    padding: 0.7rem 1.75rem 0.7rem 1.35rem;
+
+    .hud__icon {
+      grid-row: 1 / 3;
+    }
+
+    .hud__label,
+    .hud__value {
+      line-height: 1;
+    }
+  }
+
+  .hud__lives {
+    padding: 0.7rem 1.35rem 0.7rem 1.75rem;
+  }
+
+  .hud__heart {
+    width: 1.35rem;
+  }
+
+  .game-board {
+    gap: 0.65rem;
+    padding-block: 0.65rem;
+  }
+
+  .ingredient-shelf__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ingredient-card {
+    min-height: 4rem;
+  }
+
+  .ingredient-card__name {
+    white-space: normal;
+  }
+
+  .cauldron-stage {
+    min-height: 21rem;
+  }
+
+  .cauldron {
+    width: 85%;
+  }
+
+  .cauldron__rim {
+    min-height: 6rem;
+    padding-inline: 1rem;
+  }
+
+  .cauldron__body::before,
+  .cauldron__body::after {
+    border-width: 0.42rem;
+  }
+
+  .cauldron__emblem {
+    width: 4.2rem;
+    font-size: 2.8rem;
+  }
+
+  .recipe-panel {
+    min-height: 17rem;
+    padding: 1.8rem 1rem;
+  }
+}
