@@ -1,0 +1,38 @@
+@use '../abstracts/tokens' as *;
+
+.game-shell {
+  width: min(100%, 1920px);
+  min-height: 100vh;
+  padding: clamp(0.5rem, 1.5vw, 1.5rem);
+  margin: 0 auto;
+}
+
+.game-shell--paused {
+  .game-board,
+  .parameter-panel,
+  .game-controls,
+  .game-footer {
+    filter: blur(0.8rem);
+    opacity: 0.24;
+    user-select: none;
+  }
+}
+
+.game-header {
+  position: relative;
+  display: grid;
+  margin-bottom: clamp(0.8rem, 1.6vw, 1.4rem);
+  isolation: isolate;
+}
+
+.game-header__frame {
+  position: relative;
+  z-index: 1;
+  padding-inline: clamp(0.15rem, 0.7vw, 0.75rem);
+}
+
+.game-header__hud {
+  display: grid;
+  grid-template-columns: minmax(13rem, 1fr) minmax(18rem, 0.82fr) minmax(13rem, 1fr);
+  align-items: center;
+}

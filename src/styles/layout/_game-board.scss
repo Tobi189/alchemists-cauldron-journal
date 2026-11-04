@@ -1,0 +1,85 @@
+@use '../abstracts/tokens' as *;
+
+.game-board {
+  display: grid;
+  grid-template-columns: minmax(15rem, 0.78fr) minmax(19rem, 1.35fr) minmax(16rem, 0.9fr);
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  align-items: stretch;
+  padding: clamp(0.75rem, 1.5vw, 1.5rem) 0;
+}
+
+.ingredient-shelf,
+.recipe-panel {
+  position: relative;
+  min-width: 0;
+  border: 1px solid rgba($gold, 0.65);
+  box-shadow:
+    inset 0 0 0 3px rgba(#000, 0.55),
+    0 0.65rem 1.75rem rgba(#000, 0.42);
+}
+
+.ingredient-shelf {
+  padding: 1.45rem 0.85rem 0.9rem;
+  margin-top: 0.7rem;
+  border: 2px solid #69451d;
+  border-radius: 0.25rem 0.25rem 0.7rem 0.7rem;
+  background:
+    linear-gradient(90deg, rgba(#080503, 0.8), transparent 10% 90%, rgba(#080503, 0.8)),
+    repeating-linear-gradient(90deg, rgba(#fff, 0.015) 0 2px, transparent 2px 1.5rem),
+    linear-gradient(100deg, #211207, #3a210d 38%, #1b0f07 72%, #321b0a);
+  box-shadow:
+    inset 0 0 0 3px #100904,
+    inset 0 0 0 5px rgba($gold, 0.16),
+    inset 0 0 2rem rgba(#000, 0.65),
+    0 0.75rem 1.7rem rgba(#000, 0.55);
+
+  &::before {
+    position: absolute;
+    z-index: 0;
+    inset: 0.42rem;
+    border: 1px solid rgba($gold-light, 0.28);
+    content: '';
+    pointer-events: none;
+  }
+
+  &::after {
+    position: absolute;
+    z-index: 0;
+    top: 0.32rem;
+    bottom: 0.32rem;
+    left: 0.45rem;
+    width: calc(100% - 0.9rem);
+    border-inline: 0.38rem solid rgba(#120903, 0.8);
+    content: '';
+    pointer-events: none;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.recipe-panel {
+  isolation: isolate;
+}
+
+.panel-heading {
+  width: 82%;
+  padding: 0.62rem 1.5rem;
+  margin: -2.25rem auto 0.9rem;
+  border: 1px solid rgba($gold-light, 0.78);
+  background:
+    linear-gradient(90deg, transparent, rgba($gold, 0.08) 18% 82%, transparent),
+    linear-gradient(#2e1b0b, #100a05);
+  box-shadow:
+    inset 0 0 0 3px rgba(#000, 0.48),
+    0 0.45rem 0.75rem rgba(#000, 0.6);
+  clip-path: polygon(7% 0, 93% 0, 100% 50%, 93% 100%, 7% 100%, 0 50%);
+  color: $gold-light;
+  font-size: clamp(1rem, 1.6vw, 1.3rem);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-align: center;
+  text-transform: uppercase;
+}
