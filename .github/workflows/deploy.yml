@@ -3,10 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - story-1
-      - story-2
-      - story-3
-      - chore/project-delivery
+      - main
+      - creative-extension
   workflow_dispatch:
 
 permissions:
