@@ -185,11 +185,49 @@ const createHeader = (state: GameState): HTMLElement => {
   return header;
 };
 
+const getFocusedControlKey = (container: HTMLElement): string | undefined => {
+  const activeElement = document.activeElement;
+
+  return activeElement instanceof HTMLElement && container.contains(activeElement)
+    ? activeElement.dataset.focusKey
+    : undefined;
+};
+
+const restoreFocusedControl = (container: HTMLElement, focusKey: string | undefined): void => {
+  if (!focusKey) {
+    return;
+  }
+
+  const controls = container.querySelectorAll<HTMLElement>('[data-focus-key]');
+  const matchingControl = [...controls].find(
+    (control) =>
+      control.dataset.focusKey === focusKey &&
+      (!(control instanceof HTMLButtonElement) || !control.disabled),
+  );
+  const fallbackControl = focusKey.startsWith('ingredient-')
+    ? [...controls].find(
+        (control) =>
+          control.dataset.focusKey === 'brew' &&
+          control instanceof HTMLButtonElement &&
+          !control.disabled,
+      )
+    : undefined;
+
+  (matchingControl ?? fallbackControl)?.focus();
+};
+
 export const renderApp = (
   container: HTMLElement,
   state: GameState,
   handlers: AppHandlers,
 ): void => {
+  const shouldRestoreGameplayFocus =
+    state.status === 'playing' &&
+    handlers.leaderboardDialog === 'closed' &&
+    handlers.menuDialog === 'closed';
+  const focusedControlKey = shouldRestoreGameplayFocus
+    ? getFocusedControlKey(container)
+    : undefined;
   const shell = document.createElement('main');
   const board = document.createElement('div');
   const shelf = createShelf(state, handlers.onAddIngredient);
@@ -279,4 +317,5 @@ export const renderApp = (
     ...(helpDialog ? [helpDialog] : []),
     ...(settingsDialog ? [settingsDialog] : []),
   );
+  restoreFocusedControl(container, focusedControlKey);
 };

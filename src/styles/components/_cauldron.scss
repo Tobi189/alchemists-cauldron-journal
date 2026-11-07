@@ -213,14 +213,15 @@
     inset 0 0 0.5rem rgba(#fff, 0.18),
     0 0 0.8rem rgba(#f0ff9d, 0.52);
   animation: cauldron-ingredient-float 2.4s ease-in-out infinite;
+  animation-delay: var(--cauldron-animation-origin, 0ms);
 
   &:nth-child(2n) {
-    animation-delay: -0.8s;
+    animation-delay: calc(var(--cauldron-animation-origin, 0ms) - 0.8s);
     animation-duration: 2.8s;
   }
 
   &:nth-child(3n) {
-    animation-delay: -1.6s;
+    animation-delay: calc(var(--cauldron-animation-origin, 0ms) - 1.6s);
     animation-duration: 2.15s;
   }
 }

@@ -28,6 +28,7 @@ const createEmptySlot = (position: number): HTMLButtonElement => {
   slot.className = 'ingredient-card ingredient-card--empty';
   slot.type = 'button';
   slot.disabled = true;
+  slot.dataset.focusKey = `ingredient-slot-${position}`;
   slot.setAttribute('aria-label', `Empty ingredient slot ${position}`);
   badge.className = 'ingredient-card__stock';
   side.className = 'ingredient-card__side';
@@ -64,6 +65,7 @@ const createIngredientCard = (
   const badge = document.createElement('span');
 
   card.className = 'ingredient-card';
+  card.dataset.focusKey = `ingredient-${ingredient.id}`;
   card.classList.toggle('ingredient-card--tooltip', isTooltipEnabled);
   card.type = 'button';
   card.disabled = isShelfBlocked;

@@ -7,6 +7,7 @@ import { getDraggedIngredientId, isIngredientDrag } from './drag-and-drop.ts';
 
 const createCauldronContents = (state: GameState): HTMLElement => {
   const contents = document.createElement('div');
+  const animationOrigin = `-${Math.round(performance.now())}ms`;
   contents.className = 'cauldron__contents';
 
   if (state.cauldronIngredientIds.length === 0) {
@@ -31,6 +32,7 @@ const createCauldronContents = (state: GameState): HTMLElement => {
     const icon = document.createElement('img');
 
     item.className = 'cauldron__ingredient';
+    item.style.setProperty('--cauldron-animation-origin', animationOrigin);
     position.className = 'cauldron__ingredient-position';
     icon.className = 'cauldron__ingredient-icon';
     item.title = ingredient.name;
