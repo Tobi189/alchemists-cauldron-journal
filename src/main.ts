@@ -13,7 +13,7 @@ import { didClearLeaderboard, didSaveLeaderboard, loadLeaderboard } from './stor
 import { didClearSavedGame, didSaveGame, loadGame } from './storage/save.ts';
 import type { BrewResult, Difficulty, GameState } from './types/game.ts';
 import type { LeaderboardEntry } from './types/leaderboard.ts';
-import { renderApp } from './ui/app.ts';
+import { renderApp, updateTimerHud } from './ui/app.ts';
 import { getGameShortcut } from './ui/keyboard-shortcuts.ts';
 
 const app = document.querySelector<HTMLDivElement>('#app');
@@ -325,9 +325,16 @@ const startApp = (container: HTMLElement): void => {
       return;
     }
 
+    const shouldRenderEntireApp = nextState.status !== gameState.status;
+
     gameState = nextState;
     persistCurrentGame();
-    render();
+
+    if (shouldRenderEntireApp) {
+      render();
+    } else {
+      updateTimerHud(container, gameState);
+    }
   }, 250);
 
   globalThis.addEventListener('pagehide', () => {

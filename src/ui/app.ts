@@ -56,6 +56,31 @@ const formatTime = (totalSeconds: number): string => {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
+const getTimerProgress = (state: GameState): number => {
+  const { startingTimeSeconds } = getDifficultySettings(state.difficulty);
+
+  return Math.max(0, Math.min((state.timeLeft / startingTimeSeconds) * 100, 100));
+};
+
+export const updateTimerHud = (container: HTMLElement, state: GameState): void => {
+  const timer = container.querySelector<HTMLElement>('.hud__timer');
+  const value = timer?.querySelector<HTMLElement>('.hud__value');
+  const progress = timer?.querySelector<HTMLElement>('.hud__timer-progress');
+  const fill = timer?.querySelector<HTMLElement>('.hud__timer-fill');
+
+  if (!timer || !value || !progress || !fill) {
+    return;
+  }
+
+  value.textContent = formatTime(state.timeLeft);
+  progress.setAttribute('aria-valuenow', String(state.timeLeft));
+  fill.style.setProperty('--timer-progress', `${getTimerProgress(state)}%`);
+  timer.classList.toggle(
+    'hud__timer--urgent',
+    state.status === 'playing' && state.timeLeft > 0 && state.timeLeft < 15,
+  );
+};
+
 const createHudItem = (label: string, value: string, iconUrl: string): HTMLElement => {
   const item = document.createElement('div');
   const icon = document.createElement('img');
@@ -82,7 +107,6 @@ const createTimerHud = (state: GameState): HTMLElement => {
   const progress = document.createElement('div');
   const fill = document.createElement('span');
   const rules = getDifficultySettings(state.difficulty);
-  const progressPercentage = (state.timeLeft / rules.startingTimeSeconds) * 100;
 
   timer.className = 'hud__plaque hud__timer';
   progress.className = 'hud__timer-progress';
@@ -92,7 +116,7 @@ const createTimerHud = (state: GameState): HTMLElement => {
   progress.setAttribute('aria-valuemin', '0');
   progress.setAttribute('aria-valuemax', String(rules.startingTimeSeconds));
   progress.setAttribute('aria-valuenow', String(state.timeLeft));
-  fill.style.setProperty('--timer-progress', `${progressPercentage}%`);
+  fill.style.setProperty('--timer-progress', `${getTimerProgress(state)}%`);
 
   if (state.status === 'playing' && state.timeLeft > 0 && state.timeLeft < 15) {
     timer.classList.add('hud__timer--urgent');
