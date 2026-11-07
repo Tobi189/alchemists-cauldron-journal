@@ -38,7 +38,7 @@
   place-items: center;
   text-align: center;
   background:
-    url('../assets/ui/hud-title-frame.png') center / 100% 100% no-repeat,
+    url('../../assets/ui/hud-title-frame.png') center / 100% 100% no-repeat,
     radial-gradient(ellipse at 50% 45%, rgba($magic, 0.11), transparent 62%);
   filter: drop-shadow(0 0.8rem 0.7rem rgba(#000, 0.7));
 }
@@ -99,7 +99,7 @@
   filter: drop-shadow(0 0.65rem 0.55rem rgba(#000, 0.72));
 
   &::before {
-    background: url('../assets/ui/hud-side-frame.png') center / 100% 100% no-repeat;
+    background: url('../../assets/ui/hud-side-frame.png') center / 100% 100% no-repeat;
   }
 }
 
@@ -115,7 +115,7 @@
   filter: drop-shadow(0 0.75rem 0.6rem rgba(#000, 0.78));
 
   &::before {
-    background: url('../assets/ui/hud-timer-frame.png') center / 100% 100% no-repeat;
+    background: url('../../assets/ui/hud-timer-frame.png') center / 100% 100% no-repeat;
   }
 
   .hud__item {
@@ -180,7 +180,7 @@
   filter: drop-shadow(0 0.65rem 0.55rem rgba(#000, 0.72));
 
   &::before {
-    background: url('../assets/ui/hud-side-frame.png') center / 100% 100% no-repeat;
+    background: url('../../assets/ui/hud-side-frame.png') center / 100% 100% no-repeat;
     transform: scaleX(-1);
   }
 }
