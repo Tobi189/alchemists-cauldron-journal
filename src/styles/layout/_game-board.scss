@@ -19,37 +19,42 @@
 }
 
 .ingredient-shelf {
-  padding: 1.45rem 0.85rem 0.9rem;
+  padding: 1.55rem 1rem 1rem;
   margin-top: 0.7rem;
-  border: 2px solid #69451d;
+  border: 3px solid #845824;
   border-radius: 0.25rem 0.25rem 0.7rem 0.7rem;
   background:
     linear-gradient(90deg, rgba(#080503, 0.8), transparent 10% 90%, rgba(#080503, 0.8)),
     repeating-linear-gradient(90deg, rgba(#fff, 0.015) 0 2px, transparent 2px 1.5rem),
     linear-gradient(100deg, #211207, #3a210d 38%, #1b0f07 72%, #321b0a);
   box-shadow:
-    inset 0 0 0 3px #100904,
-    inset 0 0 0 5px rgba($gold, 0.16),
+    inset 0 0 0 3px #0c0703,
+    inset 0 0 0 6px rgba($gold, 0.24),
+    inset 0 0 0 7px rgba(#080402, 0.92),
     inset 0 0 2rem rgba(#000, 0.65),
+    0 0 0 1px #160c05,
+    0 0 0 3px rgba($gold, 0.12),
     0 0.75rem 1.7rem rgba(#000, 0.55);
 
   &::before {
     position: absolute;
     z-index: 0;
-    inset: 0.42rem;
-    border: 1px solid rgba($gold-light, 0.28);
+    inset: 0.5rem;
+    border: 1px solid rgba($gold-light, 0.5);
+    border-radius: 0.12rem 0.12rem 0.42rem 0.42rem;
     content: '';
     pointer-events: none;
+    box-shadow: inset 0 0 0 2px rgba(#070402, 0.72);
   }
 
   &::after {
     position: absolute;
     z-index: 0;
-    top: 0.32rem;
-    bottom: 0.32rem;
-    left: 0.45rem;
-    width: calc(100% - 0.9rem);
-    border-inline: 0.38rem solid rgba(#120903, 0.8);
+    inset: 0.72rem 0.68rem;
+    border: 1px solid rgba($gold, 0.2);
+    border-inline-width: 0.42rem;
+    border-inline-color: rgba(#120903, 0.88);
+    border-radius: 0.08rem 0.08rem 0.3rem 0.3rem;
     content: '';
     pointer-events: none;
   }
@@ -68,12 +73,13 @@
   width: 82%;
   padding: 0.62rem 1.5rem;
   margin: -2.25rem auto 0.9rem;
-  border: 1px solid rgba($gold-light, 0.78);
+  border: 2px solid rgba($gold-light, 0.82);
   background:
     linear-gradient(90deg, transparent, rgba($gold, 0.08) 18% 82%, transparent),
     linear-gradient(#2e1b0b, #100a05);
   box-shadow:
     inset 0 0 0 3px rgba(#000, 0.48),
+    inset 0 0 0 4px rgba($gold, 0.16),
     0 0.45rem 0.75rem rgba(#000, 0.6);
   clip-path: polygon(7% 0, 93% 0, 100% 50%, 93% 100%, 7% 100%, 0 50%);
   color: $gold-light;

@@ -3,6 +3,7 @@ import magicIconUrl from '../assets/ui/magic.svg';
 import potionSketchUrl from '../assets/ui/potion-sketch.svg';
 import temperatureIconUrl from '../assets/ui/temperature.svg';
 import { getDifficultySettings } from '../data/difficulty.ts';
+import { getRecipeArtworkUrl } from '../data/recipe-artwork.ts';
 import type { GameState, RecipeRange } from '../types/game.ts';
 
 const formatRange = (range: RecipeRange): string => `${range.min}–${range.max}`;
@@ -53,7 +54,14 @@ export const createRecipePanel = (state: GameState): HTMLElement => {
   counter.textContent = `Ingredients: ${count} / ${rules.cauldronCapacity}`;
 
   if (state.activeRecipe) {
+    const artworkUrl = getRecipeArtworkUrl(state.activeRecipe.id);
+
+    panel.classList.add('recipe-panel--active', `recipe-panel--${state.activeRecipe.difficulty}`);
     title.textContent = state.activeRecipe.name;
+    sketch.className = 'recipe-panel__artwork';
+    sketch.src = artworkUrl ?? potionSketchUrl;
+    sketch.alt = `${state.activeRecipe.name} recipe emblem`;
+    sketch.removeAttribute('aria-hidden');
     content.classList.add('recipe-panel__ranges');
     content.append(
       createRangeRow(

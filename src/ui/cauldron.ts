@@ -1,4 +1,3 @@
-import cauldronEmblemUrl from '../assets/ui/cauldron-emblem.svg';
 import ornateCauldronUrl from '../assets/ui/ornate-cauldron.webp';
 import { getDifficultySettings } from '../data/difficulty.ts';
 import { INGREDIENTS } from '../data/ingredients.ts';
@@ -59,8 +58,6 @@ export const createCauldron = (
   const artwork = document.createElement('img');
   const rim = document.createElement('div');
   const liquid = document.createElement('div');
-  const body = document.createElement('div');
-  const emblem = document.createElement('img');
   const feedback = document.createElement('div');
   const rules = getDifficultySettings(state.difficulty);
   const canAcceptDrop =
@@ -78,16 +75,11 @@ export const createCauldron = (
   artwork.className = 'cauldron__artwork';
   rim.className = 'cauldron__rim';
   liquid.className = 'cauldron__liquid';
-  body.className = 'cauldron__body';
-  emblem.className = 'cauldron__emblem';
   feedback.className = 'cauldron-feedback';
   artwork.src = ornateCauldronUrl;
   artwork.alt = '';
   artwork.draggable = false;
   artwork.setAttribute('aria-hidden', 'true');
-  emblem.src = cauldronEmblemUrl;
-  emblem.alt = '';
-  emblem.setAttribute('aria-hidden', 'true');
   feedback.setAttribute('aria-hidden', 'true');
 
   if (brewVisualFeedback) {
@@ -140,8 +132,7 @@ export const createCauldron = (
 
   liquid.append(createCauldronContents(state));
   rim.append(liquid);
-  body.append(emblem);
-  vessel.append(artwork, rim, body);
+  vessel.append(artwork, rim);
   stage.append(glow, vessel, feedback);
 
   section.append(stage);

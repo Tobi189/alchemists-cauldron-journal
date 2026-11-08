@@ -1,5 +1,13 @@
 import type { BrewResult, Difficulty } from '../types/game.ts';
-import type { JournalData, JournalSessionProgress, SessionOutcome } from '../types/journal.ts';
+import type {
+  JournalData,
+  JournalRecipeCombination,
+  JournalSessionProgress,
+  SessionOutcome,
+} from '../types/journal.ts';
+
+export const MAX_RECIPE_COMBINATIONS = 5;
+const compareIds = (left: string, right: string): number => left.localeCompare(right);
 
 const createSessionId = (): string => globalThis.crypto.randomUUID();
 
@@ -22,6 +30,56 @@ const appendUnique = (
   return nextValues;
 };
 
+const getCombinationKey = (combination: JournalRecipeCombination): string =>
+  [
+    combination.recipeId,
+    combination.ingredientIds.toSorted(compareIds).join(','),
+    combination.reactionIds.toSorted(compareIds).join(','),
+  ].join('|');
+
+const appendRecipeCombination = (
+  combinations: readonly JournalRecipeCombination[],
+  combination: JournalRecipeCombination,
+): readonly JournalRecipeCombination[] => {
+  const normalizedCombination: JournalRecipeCombination = {
+    ...combination,
+    ingredientIds: combination.ingredientIds.toSorted(compareIds),
+    reactionIds: combination.reactionIds.toSorted(compareIds),
+  };
+  const combinationKey = getCombinationKey(normalizedCombination);
+
+  if (combinations.some((item) => getCombinationKey(item) === combinationKey)) {
+    return combinations;
+  }
+
+  const otherRecipes = combinations.filter((item) => item.recipeId !== combination.recipeId);
+  const sameRecipe = combinations
+    .filter((item) => item.recipeId === combination.recipeId)
+    .slice(-(MAX_RECIPE_COMBINATIONS - 1));
+
+  return [...otherRecipes, ...sameRecipe, normalizedCombination];
+};
+
+const mergeRecipeCombinations = (
+  current: JournalData['discoveries']['recipeCombinations'],
+  additions: readonly JournalRecipeCombination[],
+): JournalData['discoveries']['recipeCombinations'] => {
+  let next = current;
+
+  for (const addition of additions) {
+    const existing = next[addition.recipeId] ?? [];
+    const combined = appendRecipeCombination(existing, addition);
+
+    if (combined === existing) {
+      continue;
+    }
+
+    next = { ...next, [addition.recipeId]: combined };
+  }
+
+  return next;
+};
+
 export const createJournalSession = (
   startedAt: number = Date.now(),
   id: string = createSessionId(),
@@ -35,6 +93,7 @@ export const createJournalSession = (
   ingredientUsage: {},
   recipeIds: [],
   reactionIds: [],
+  recipeCombinations: [],
 });
 
 export const recordIngredientUse = (
@@ -57,6 +116,7 @@ export const recordBrew = (
   session: JournalSessionProgress | undefined,
   result: BrewResult,
   recipeId: string,
+  combination?: JournalRecipeCombination,
 ): JournalSessionProgress | undefined => {
   if (!session) {
     return undefined;
@@ -78,6 +138,9 @@ export const recordBrew = (
     currentStreak,
     bestStreak: Math.max(session.bestStreak, currentStreak),
     recipeIds: appendUnique(session.recipeIds, [recipeId]),
+    recipeCombinations: combination
+      ? appendRecipeCombination(session.recipeCombinations, combination)
+      : session.recipeCombinations,
   };
 };
 
@@ -95,18 +158,23 @@ export const syncJournalDiscoveries = (
   );
   const recipeIds = appendUnique(journal.discoveries.recipeIds, session.recipeIds);
   const reactionIds = appendUnique(journal.discoveries.reactionIds, session.reactionIds);
+  const recipeCombinations = mergeRecipeCombinations(
+    journal.discoveries.recipeCombinations,
+    session.recipeCombinations,
+  );
 
   if (
     ingredientIds.length === journal.discoveries.ingredientIds.length &&
     recipeIds.length === journal.discoveries.recipeIds.length &&
-    reactionIds.length === journal.discoveries.reactionIds.length
+    reactionIds.length === journal.discoveries.reactionIds.length &&
+    recipeCombinations === journal.discoveries.recipeCombinations
   ) {
     return journal;
   }
 
   return {
     ...journal,
-    discoveries: { ingredientIds, recipeIds, reactionIds },
+    discoveries: { ingredientIds, recipeIds, reactionIds, recipeCombinations },
   };
 };
 
@@ -141,6 +209,7 @@ export const finalizeJournalSession = (
         ingredientUsage: session.ingredientUsage,
         recipeIds: session.recipeIds,
         reactionIds: session.reactionIds,
+        recipeCombinations: session.recipeCombinations,
       },
     ],
   };

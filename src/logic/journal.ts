@@ -1,7 +1,7 @@
 import type { JournalData } from '../types/journal.ts';
 import { isValidPlayerName } from './leaderboard.ts';
 
-export const JOURNAL_VERSION = 1 as const;
+export const JOURNAL_VERSION = 2 as const;
 export const DEFAULT_PROFILE_NAME = 'Alchemist';
 
 export const createDefaultJournal = (createdAt: number = Date.now()): JournalData => ({
@@ -16,6 +16,7 @@ export const createDefaultJournal = (createdAt: number = Date.now()): JournalDat
     ingredientIds: [],
     recipeIds: [],
     reactionIds: [],
+    recipeCombinations: {},
   },
   achievements: [],
 });
