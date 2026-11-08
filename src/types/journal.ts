@@ -24,6 +24,18 @@ export interface JournalSession {
   readonly reactionIds: readonly string[];
 }
 
+export interface JournalSessionProgress {
+  readonly id: string;
+  readonly startedAt: number;
+  readonly successfulBrews: number;
+  readonly failedBrews: number;
+  readonly currentStreak: number;
+  readonly bestStreak: number;
+  readonly ingredientUsage: Readonly<Record<string, number>>;
+  readonly recipeIds: readonly string[];
+  readonly reactionIds: readonly string[];
+}
+
 export interface JournalDiscoveries {
   readonly ingredientIds: readonly string[];
   readonly recipeIds: readonly string[];

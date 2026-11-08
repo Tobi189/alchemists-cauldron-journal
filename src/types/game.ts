@@ -1,3 +1,5 @@
+import type { JournalSessionProgress } from './journal.ts';
+
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type GameStatus = 'menu' | 'playing' | 'paused' | 'game-over';
 export type BrewResult = 'success' | 'failure';
@@ -78,4 +80,5 @@ export interface GameState {
   readonly shelfStock: ShelfStock;
   readonly cauldronIngredientIds: readonly string[];
   readonly previousCauldronIngredientIds: readonly string[];
+  readonly journalSession: JournalSessionProgress | undefined;
 }
