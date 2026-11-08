@@ -4,6 +4,7 @@ import scoreIconUrl from '../assets/ui/score-emblem.svg';
 import { getDifficultySettings } from '../data/difficulty.ts';
 import type { BrewResult, Difficulty, GameState } from '../types/game.ts';
 import type { LeaderboardEntry } from '../types/leaderboard.ts';
+import type { JournalData } from '../types/journal.ts';
 import { createCauldron } from './cauldron.ts';
 import {
   createClearLeaderboardDialog,
@@ -14,6 +15,7 @@ import {
   createSettingsDialog,
 } from './dialogs.ts';
 import { createGameControls } from './game-controls.ts';
+import { createJournalDialog, type JournalTab } from './journal.ts';
 import { createParameterBars } from './parameter-bars.ts';
 import { createRecipePanel } from './recipe.ts';
 import { createShelf } from './shelf.ts';
@@ -22,7 +24,9 @@ export interface AppHandlers {
   readonly leaderboardEntries: readonly LeaderboardEntry[];
   readonly leaderboardDifficulty: Difficulty;
   readonly leaderboardDialog: 'closed' | 'open' | 'confirm-clear';
-  readonly menuDialog: 'closed' | 'help' | 'settings';
+  readonly menuDialog: 'closed' | 'help' | 'settings' | 'journal';
+  readonly journal: JournalData;
+  readonly journalTab: JournalTab;
   readonly leaderboardNotice: string | undefined;
   readonly brewVisualFeedback: BrewResult | undefined;
   readonly shouldRequestPlayerName: boolean;
@@ -31,6 +35,9 @@ export interface AppHandlers {
   readonly onContinueGame: () => void;
   readonly onPlayAgain: () => void;
   readonly onOpenLeaderboard: () => void;
+  readonly onOpenJournal: () => void;
+  readonly onSelectJournalTab: (tab: JournalTab) => void;
+  readonly onUpdateJournalProfile: (displayName: string) => void;
   readonly onSelectLeaderboardDifficulty: (difficulty: Difficulty) => void;
   readonly onCloseLeaderboard: () => void;
   readonly onRequestClearLeaderboard: () => void;
@@ -242,6 +249,7 @@ export const renderApp = (
     handlers.onBrew,
     handlers.onPourOut,
     handlers.onOpenLeaderboard,
+    handlers.onOpenJournal,
     handlers.onOpenHelp,
     handlers.onOpenSettings,
     handlers.onPause,
@@ -276,6 +284,16 @@ export const renderApp = (
       ? createSettingsDialog(
           state.difficulty,
           handlers.onSelectDifficulty,
+          handlers.onCloseMenuDialog,
+        )
+      : undefined;
+  const journalDialog =
+    handlers.menuDialog === 'journal'
+      ? createJournalDialog(
+          handlers.journal,
+          handlers.journalTab,
+          handlers.onSelectJournalTab,
+          handlers.onUpdateJournalProfile,
           handlers.onCloseMenuDialog,
         )
       : undefined;
@@ -316,6 +334,7 @@ export const renderApp = (
     ...(clearConfirmation ? [clearConfirmation] : []),
     ...(helpDialog ? [helpDialog] : []),
     ...(settingsDialog ? [settingsDialog] : []),
+    ...(journalDialog ? [journalDialog] : []),
   );
   restoreFocusedControl(container, focusedControlKey);
 };

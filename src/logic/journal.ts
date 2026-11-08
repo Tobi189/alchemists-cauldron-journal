@@ -1,4 +1,5 @@
 import type { JournalData } from '../types/journal.ts';
+import { isValidPlayerName } from './leaderboard.ts';
 
 export const JOURNAL_VERSION = 1 as const;
 export const DEFAULT_PROFILE_NAME = 'Alchemist';
@@ -18,3 +19,24 @@ export const createDefaultJournal = (createdAt: number = Date.now()): JournalDat
   },
   achievements: [],
 });
+
+export const updateJournalProfile = (
+  journal: JournalData,
+  displayName: string,
+  updatedAt: number = Date.now(),
+): JournalData => {
+  const normalizedName = displayName.trim();
+
+  if (!isValidPlayerName(normalizedName) || normalizedName === journal.profile.displayName) {
+    return journal;
+  }
+
+  return {
+    ...journal,
+    profile: {
+      ...journal.profile,
+      displayName: normalizedName,
+      updatedAt: Math.max(updatedAt, journal.profile.createdAt),
+    },
+  };
+};
