@@ -1,8 +1,10 @@
 import { ACHIEVEMENTS } from '../data/achievements.ts';
 import { INGREDIENTS } from '../data/ingredients.ts';
 import { REACTIONS } from '../data/reactions.ts';
+import { getRecipeArtworkUrl } from '../data/recipe-artwork.ts';
 import { RECIPES } from '../data/recipes.ts';
 import { isValidPlayerName } from '../logic/leaderboard.ts';
+import type { Recipe, RecipeRange } from '../types/game.ts';
 import type { JournalData, JournalSession } from '../types/journal.ts';
 
 export const JOURNAL_TABS = ['overview', 'discoveries', 'achievements', 'history'] as const;
@@ -202,13 +204,111 @@ const createDiscoveryGroup = (
   return section;
 };
 
+const formatRecipeRange = (range: RecipeRange): string => `${range.min}–${range.max}`;
+
+const createRecipeDiscoveryGroup = (
+  recipes: readonly Recipe[],
+  discoveredIds: readonly string[],
+): HTMLElement => {
+  const section = document.createElement('section');
+  const heading = document.createElement('div');
+  const title = document.createElement('h3');
+  const count = document.createElement('span');
+  const grid = document.createElement('div');
+  const discoveries = new Set(discoveredIds);
+
+  section.className = 'journal-section journal-discoveries';
+  heading.className = 'journal-section__heading';
+  title.className = 'journal-section__title';
+  title.textContent = 'Recipes';
+  count.className = 'journal-section__count';
+  count.textContent = `${discoveries.size}/${recipes.length}`;
+  grid.className = 'journal-recipe-grid';
+
+  for (const recipe of recipes) {
+    const isDiscovered = discoveries.has(recipe.id);
+    const artworkUrl = getRecipeArtworkUrl(recipe.id);
+    const card = document.createElement('article');
+    const artworkFrame = document.createElement('div');
+    const details = document.createElement('div');
+    const cardHeading = document.createElement('div');
+    const name = document.createElement('strong');
+
+    card.className = 'journal-recipe';
+    card.classList.toggle('journal-recipe--locked', !isDiscovered);
+    card.setAttribute('aria-label', isDiscovered ? recipe.name : 'Undiscovered recipe');
+    artworkFrame.className = 'journal-recipe__artwork-frame';
+    details.className = 'journal-recipe__details';
+    cardHeading.className = 'journal-recipe__heading';
+    name.className = 'journal-recipe__name';
+    name.textContent = isDiscovered ? recipe.name : 'Undiscovered';
+
+    if (artworkUrl) {
+      const artwork = document.createElement('img');
+      artwork.className = 'journal-recipe__artwork';
+      artwork.src = artworkUrl;
+      artwork.alt = '';
+      artwork.setAttribute('aria-hidden', 'true');
+      artworkFrame.append(artwork);
+    } else {
+      const placeholder = document.createElement('span');
+      placeholder.className = 'journal-recipe__placeholder';
+      placeholder.setAttribute('aria-hidden', 'true');
+      placeholder.textContent = isDiscovered ? '✦' : '?';
+      artworkFrame.append(placeholder);
+    }
+
+    cardHeading.append(name);
+
+    if (isDiscovered) {
+      const difficulty = document.createElement('span');
+      const ranges = document.createElement('div');
+      const rangeValues: readonly [string, RecipeRange][] = [
+        ['T', recipe.temperature],
+        ['D', recipe.density],
+        ['MP', recipe.magicPower],
+      ];
+
+      difficulty.className = `journal-recipe__difficulty journal-recipe__difficulty--${recipe.difficulty}`;
+      difficulty.textContent = formatLabel(recipe.difficulty);
+      ranges.className = 'journal-recipe__ranges';
+      cardHeading.append(difficulty);
+
+      for (const [label, range] of rangeValues) {
+        const rangeElement = document.createElement('span');
+        const labelElement = document.createElement('abbr');
+        labelElement.title =
+          label === 'T' ? 'Temperature' : label === 'D' ? 'Density' : 'Magic Power';
+        labelElement.textContent = label;
+        rangeElement.append(labelElement, ` ${formatRecipeRange(range)}`);
+        ranges.append(rangeElement);
+      }
+
+      details.append(cardHeading, ranges);
+    } else {
+      const hint = document.createElement('span');
+      hint.className = 'journal-recipe__locked-hint';
+      hint.textContent = 'Brew successfully to reveal';
+      details.append(cardHeading, hint);
+    }
+
+    card.append(artworkFrame, details);
+    grid.append(card);
+  }
+
+  heading.append(title, count);
+  section.append(heading, grid);
+
+  return section;
+};
+
 const createDiscoveries = (journal: JournalData): HTMLElement => {
   const content = document.createElement('div');
 
   content.className = 'journal-panel';
   content.append(
     createDiscoveryGroup('Ingredients', INGREDIENTS, journal.discoveries.ingredientIds),
-    createDiscoveryGroup('Recipes', RECIPES, journal.discoveries.recipeIds),
+    createRecipeDiscoveryGroup(RECIPES, journal.discoveries.recipeIds),
     createDiscoveryGroup('Reactions', REACTIONS, journal.discoveries.reactionIds),
   );
 

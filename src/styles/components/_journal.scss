@@ -237,6 +237,138 @@
   overflow-wrap: anywhere;
 }
 
+.journal-recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+  gap: 0.75rem;
+}
+
+.journal-recipe {
+  overflow: hidden;
+  border: 1px solid rgba($gold-light, 0.48);
+  border-radius: 0.5rem;
+  background:
+    radial-gradient(circle at 50% 25%, rgba($arcane, 0.14), transparent 48%),
+    linear-gradient(160deg, rgba(#191326, 0.95), rgba(#050806, 0.98));
+  box-shadow:
+    inset 0 0 0 2px rgba(#000, 0.45),
+    0 0.45rem 0.8rem rgba(#000, 0.35);
+}
+
+.journal-recipe__artwork-frame {
+  display: grid;
+  min-height: 9rem;
+  padding: 0.65rem 0.65rem 0;
+  overflow: hidden;
+  place-items: center;
+  border-bottom: 1px solid rgba($gold, 0.26);
+  background: radial-gradient(circle, rgba($gold, 0.08), transparent 68%);
+}
+
+.journal-recipe__artwork {
+  display: block;
+  width: 100%;
+  height: 8.5rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0.4rem 0.55rem rgba(#000, 0.72)) drop-shadow(0 0 0.5rem rgba($arcane, 0.24));
+}
+
+.journal-recipe__placeholder {
+  display: grid;
+  width: 4.5rem;
+  aspect-ratio: 1;
+  border: 1px solid rgba($gold-light, 0.55);
+  border-radius: 50%;
+  color: $gold-light;
+  font-size: 2rem;
+  place-items: center;
+}
+
+.journal-recipe__details {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.65rem 0.75rem 0.75rem;
+}
+
+.journal-recipe__heading {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.journal-recipe__name {
+  min-width: 0;
+  overflow: hidden;
+  color: #f3e3b2;
+  font-size: 0.86rem;
+  letter-spacing: 0.035em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.journal-recipe__difficulty {
+  flex: none;
+  padding: 0.13rem 0.35rem;
+  border: 1px solid currentcolor;
+  border-radius: 999px;
+  color: $arcane;
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.journal-recipe__difficulty--easy {
+  color: $density;
+}
+
+.journal-recipe__difficulty--hard {
+  color: #ff8069;
+}
+
+.journal-recipe__ranges {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.25rem;
+
+  span {
+    padding: 0.22rem 0.18rem;
+    border: 1px solid rgba($gold, 0.24);
+    border-radius: 0.22rem;
+    color: $muted-ink;
+    font-size: 0.64rem;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    background: rgba(#020402, 0.56);
+  }
+
+  abbr {
+    color: $gold-light;
+    text-decoration: none;
+  }
+}
+
+.journal-recipe--locked {
+  border-color: rgba($muted-ink, 0.2);
+  background: rgba(#020402, 0.58);
+
+  .journal-recipe__artwork {
+    filter: grayscale(1) brightness(0.13) contrast(1.35);
+    opacity: 0.68;
+  }
+
+  .journal-recipe__name {
+    color: $muted-ink;
+  }
+}
+
+.journal-recipe__locked-hint {
+  color: rgba($muted-ink, 0.68);
+  font-size: 0.68rem;
+  font-style: italic;
+}
+
 .journal-achievements {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -411,6 +543,10 @@
   }
 
   .journal-achievements {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .journal-recipe-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
