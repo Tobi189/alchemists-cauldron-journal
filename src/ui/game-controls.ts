@@ -61,6 +61,7 @@ export const createGameControls = (
   onBrew: () => void,
   onPourOut: () => void,
   onOpenLeaderboard: () => void,
+  onOpenJournal: () => void,
   onOpenHelp: () => void,
   onOpenSettings: () => void,
   onPause: () => void,
@@ -88,6 +89,12 @@ export const createGameControls = (
         () => {
           onOpenLeaderboard();
         },
+      ),
+      createActionButton(
+        'Journal',
+        'journal',
+        'secondary-action game-controls__side-action',
+        onOpenJournal,
       ),
     );
     const startActions = document.createElement('div');

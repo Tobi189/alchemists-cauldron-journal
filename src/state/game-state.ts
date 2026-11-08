@@ -3,6 +3,7 @@ import { INGREDIENTS } from '../data/ingredients.ts';
 import { selectRandomRecipe } from '../logic/recipe-generator.ts';
 import { selectRandomReactionIds } from '../data/reactions.ts';
 import { createShelfStock } from '../logic/stock.ts';
+import { createJournalSession } from '../logic/journal-session.ts';
 import type { Difficulty, GameState, RandomSource, TimestampSource } from '../types/game.ts';
 
 export const createMenuState = (difficulty: Difficulty = DEFAULT_DIFFICULTY): GameState => ({
@@ -20,6 +21,7 @@ export const createMenuState = (difficulty: Difficulty = DEFAULT_DIFFICULTY): Ga
   shelfStock: {},
   cauldronIngredientIds: [],
   previousCauldronIngredientIds: [],
+  journalSession: undefined,
 });
 
 export const createNewGameState = (
@@ -45,5 +47,6 @@ export const createNewGameState = (
     shelfStock: createShelfStock(INGREDIENTS, rules.shelfSize, random),
     cauldronIngredientIds: [],
     previousCauldronIngredientIds: [],
+    journalSession: createJournalSession(getTimestamp()),
   };
 };

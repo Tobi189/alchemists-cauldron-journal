@@ -4,6 +4,7 @@ import { isValueInRange } from './range.ts';
 import { calculateReactedCauldronValues } from './reactions.ts';
 import { selectRandomRecipe } from './recipe-generator.ts';
 import { getRemainingTime } from './timer.ts';
+import { recordBrew } from './journal-session.ts';
 import type {
   GameState,
   ParameterValues,
@@ -62,6 +63,7 @@ export const brewPotion = (
       timerEndsAt: timestamp + nextTimeLeft * 1000,
       activeRecipe: selectRandomRecipe(state.difficulty, random),
       lastBrewResult: 'success',
+      journalSession: recordBrew(state.journalSession, 'success', state.activeRecipe.id),
     };
   }
 
@@ -69,5 +71,6 @@ export const brewPotion = (
     ...clearedState,
     lives: Math.max(state.lives - 1, 0),
     lastBrewResult: 'failure',
+    journalSession: recordBrew(state.journalSession, 'failure', state.activeRecipe.id),
   };
 };
