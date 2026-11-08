@@ -2,14 +2,16 @@ import { DIFFICULTIES, getDifficultySettings } from '../data/difficulty.ts';
 import { INGREDIENTS } from '../data/ingredients.ts';
 import { getReactionsForDifficulty } from '../data/reactions.ts';
 import { RECIPES } from '../data/recipes.ts';
-import { createJournalSession } from '../logic/journal-session.ts';
+import { createJournalSession, MAX_RECIPE_COMBINATIONS } from '../logic/journal-session.ts';
 import type { Difficulty, GameState, Recipe, ShelfStock } from '../types/game.ts';
-import type { JournalSessionProgress } from '../types/journal.ts';
+import type { JournalRecipeCombination, JournalSessionProgress } from '../types/journal.ts';
 
 const SAVE_STORAGE_KEY = 'alchemists-cauldron:saved-game';
 const LEGACY_SAVE_VERSION = 2;
-const SAVE_VERSION = 3;
+const JOURNAL_SAVE_VERSION = 3;
+const SAVE_VERSION = 4;
 const SESSION_ID_MAX_LENGTH = 100;
+const compareIds = (left: string, right: string): number => left.localeCompare(right);
 
 interface SavedGame {
   readonly version: number;
@@ -179,10 +181,88 @@ const parseSessionIngredientUsage = (
   return usage;
 };
 
+const parseSessionRecipeCombinations = (
+  value: unknown,
+  difficulty: Difficulty,
+  enabledReactionIds: readonly string[],
+  shouldAllowMissing: boolean,
+): readonly JournalRecipeCombination[] | undefined => {
+  if (shouldAllowMissing && value === undefined) {
+    return [];
+  }
+
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+
+  const rules = getDifficultySettings(difficulty);
+  const validIngredientIds = new Set<string>(
+    INGREDIENTS.slice(0, rules.shelfSize).map((ingredient) => ingredient.id),
+  );
+  const validRecipeIds = new Set<string>(
+    RECIPES.filter((recipe) => recipe.difficulty === difficulty).map((recipe) => recipe.id),
+  );
+  const validReactionIds = new Set(enabledReactionIds);
+  const combinations: JournalRecipeCombination[] = [];
+  const keys = new Set<string>();
+  const countsByRecipe = new Map<string, number>();
+
+  for (const item of value) {
+    if (
+      !isRecord(item) ||
+      typeof item.recipeId !== 'string' ||
+      !validRecipeIds.has(item.recipeId) ||
+      !Array.isArray(item.ingredientIds) ||
+      item.ingredientIds.length === 0 ||
+      item.ingredientIds.length > rules.cauldronCapacity ||
+      item.ingredientIds.some(
+        (ingredientId) => typeof ingredientId !== 'string' || !validIngredientIds.has(ingredientId),
+      ) ||
+      !isRecord(item.values) ||
+      !Number.isSafeInteger(item.values.temperature) ||
+      !Number.isSafeInteger(item.values.density) ||
+      !Number.isSafeInteger(item.values.magicPower)
+    ) {
+      return undefined;
+    }
+
+    const reactionIds = parseUniqueSessionIds(item.reactionIds, validReactionIds);
+
+    if (!reactionIds) {
+      return undefined;
+    }
+
+    const ingredientIds = (item.ingredientIds as string[]).toSorted(compareIds);
+    const sortedReactionIds = reactionIds.toSorted(compareIds);
+    const key = `${item.recipeId}|${ingredientIds.join(',')}|${sortedReactionIds.join(',')}`;
+    const recipeCount = (countsByRecipe.get(item.recipeId) ?? 0) + 1;
+
+    if (keys.has(key) || recipeCount > MAX_RECIPE_COMBINATIONS) {
+      return undefined;
+    }
+
+    combinations.push({
+      recipeId: item.recipeId,
+      ingredientIds,
+      values: {
+        temperature: item.values.temperature as number,
+        density: item.values.density as number,
+        magicPower: item.values.magicPower as number,
+      },
+      reactionIds: sortedReactionIds,
+    });
+    keys.add(key);
+    countsByRecipe.set(item.recipeId, recipeCount);
+  }
+
+  return combinations;
+};
+
 const parseJournalSession = (
   value: unknown,
   difficulty: Difficulty,
   enabledReactionIds: readonly string[],
+  shouldAllowMissingCombinations: boolean,
 ): JournalSessionProgress | undefined => {
   if (
     !isRecord(value) ||
@@ -208,8 +288,21 @@ const parseJournalSession = (
     ),
   );
   const reactionIds = parseUniqueSessionIds(value.reactionIds, new Set(enabledReactionIds));
+  const recipeCombinations = parseSessionRecipeCombinations(
+    value.recipeCombinations,
+    difficulty,
+    enabledReactionIds,
+    shouldAllowMissingCombinations,
+  );
 
-  if (!ingredientUsage || !recipeIds || !reactionIds || recipeIds.length > value.successfulBrews) {
+  if (
+    !ingredientUsage ||
+    !recipeIds ||
+    !reactionIds ||
+    !recipeCombinations ||
+    recipeIds.length > value.successfulBrews ||
+    recipeCombinations.some((combination) => !recipeIds.includes(combination.recipeId))
+  ) {
     return undefined;
   }
 
@@ -223,13 +316,16 @@ const parseJournalSession = (
     ingredientUsage,
     recipeIds,
     reactionIds,
+    recipeCombinations,
   };
 };
 
 const parseSavedGame = (value: unknown): GameState | undefined => {
   if (
     !isRecord(value) ||
-    (value.version !== LEGACY_SAVE_VERSION && value.version !== SAVE_VERSION) ||
+    (value.version !== LEGACY_SAVE_VERSION &&
+      value.version !== JOURNAL_SAVE_VERSION &&
+      value.version !== SAVE_VERSION) ||
     !isDifficulty(value.difficulty)
   ) {
     return undefined;
@@ -251,7 +347,12 @@ const parseSavedGame = (value: unknown): GameState | undefined => {
   const journalSession = enabledReactionIds
     ? value.version === LEGACY_SAVE_VERSION
       ? createJournalSession()
-      : parseJournalSession(value.journalSession, difficulty, enabledReactionIds)
+      : parseJournalSession(
+          value.journalSession,
+          difficulty,
+          enabledReactionIds,
+          value.version === JOURNAL_SAVE_VERSION,
+        )
     : undefined;
   const hasValidStatus = value.status === 'playing' || value.status === 'paused';
 

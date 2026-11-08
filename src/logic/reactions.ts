@@ -20,6 +20,12 @@ const getActiveReactions = (
   );
 };
 
+export const getActiveReactionIds = (
+  ingredientIds: readonly string[],
+  enabledReactionIds: readonly string[],
+): readonly string[] =>
+  getActiveReactions(ingredientIds, enabledReactionIds).map((reaction) => reaction.id);
+
 export const calculateReactedCauldronValues = (
   ingredientIds: readonly string[],
   enabledReactionIds: readonly string[],

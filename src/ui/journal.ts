@@ -5,7 +5,12 @@ import { getRecipeArtworkUrl } from '../data/recipe-artwork.ts';
 import { RECIPES } from '../data/recipes.ts';
 import { isValidPlayerName } from '../logic/leaderboard.ts';
 import type { Recipe, RecipeRange } from '../types/game.ts';
-import type { JournalData, JournalSession } from '../types/journal.ts';
+import type {
+  JournalData,
+  JournalDiscoveries,
+  JournalRecipeCombination,
+  JournalSession,
+} from '../types/journal.ts';
 
 export const JOURNAL_TABS = ['overview', 'discoveries', 'achievements', 'history'] as const;
 
@@ -206,29 +211,134 @@ const createDiscoveryGroup = (
 
 const formatRecipeRange = (range: RecipeRange): string => `${range.min}–${range.max}`;
 
+const createCombinationIngredients = (combination: JournalRecipeCombination): HTMLElement => {
+  const list = document.createElement('div');
+  const ingredientCounts = new Map<string, number>();
+
+  list.className = 'journal-combination__ingredients';
+
+  for (const ingredientId of combination.ingredientIds) {
+    ingredientCounts.set(ingredientId, (ingredientCounts.get(ingredientId) ?? 0) + 1);
+  }
+
+  for (const ingredient of INGREDIENTS) {
+    const amount = ingredientCounts.get(ingredient.id);
+
+    if (!amount) {
+      continue;
+    }
+
+    const item = document.createElement('span');
+    const icon = document.createElement('img');
+    const label = document.createElement('span');
+    item.className = 'journal-combination__ingredient';
+    icon.src = ingredient.iconUrl;
+    icon.alt = '';
+    icon.setAttribute('aria-hidden', 'true');
+    label.textContent = amount > 1 ? `${amount}× ${ingredient.name}` : ingredient.name;
+    item.append(icon, label);
+    list.append(item);
+  }
+
+  return list;
+};
+
+const createCombinationStats = (combination: JournalRecipeCombination): HTMLElement => {
+  const stats = document.createElement('div');
+  const values: readonly [string, number, string][] = [
+    ['T', combination.values.temperature, 'Temperature'],
+    ['D', combination.values.density, 'Density'],
+    ['MP', combination.values.magicPower, 'Magic Power'],
+  ];
+
+  stats.className = 'journal-combination__stats';
+
+  for (const [label, value, fullLabel] of values) {
+    const stat = document.createElement('span');
+    const abbreviation = document.createElement('abbr');
+    abbreviation.title = fullLabel;
+    abbreviation.textContent = label;
+    stat.append(abbreviation, ` ${value}`);
+    stats.append(stat);
+  }
+
+  return stats;
+};
+
+const createRecipeCombinationPanel = (
+  combinations: readonly JournalRecipeCombination[],
+): HTMLElement => {
+  const panel = document.createElement('section');
+  const heading = document.createElement('h4');
+
+  panel.className = 'journal-recipe__combination-panel';
+  heading.className = 'journal-recipe__combination-title';
+  heading.textContent = 'Discovered combinations';
+  panel.append(heading);
+
+  if (combinations.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'journal-recipe__combination-empty';
+    empty.textContent = 'Brew this recipe again to record its ingredient combination.';
+    panel.append(empty);
+    return panel;
+  }
+
+  const list = document.createElement('div');
+  list.className = 'journal-recipe__combination-list';
+
+  for (const [index, combination] of combinations.entries()) {
+    const card = document.createElement('article');
+    const title = document.createElement('h5');
+    const reactions = document.createElement('p');
+    const reactionNames = combination.reactionIds
+      .map((reactionId) => REACTIONS.find((reaction) => reaction.id === reactionId)?.name)
+      .filter((name): name is string => name !== undefined);
+
+    card.className = 'journal-combination';
+    title.className = 'journal-combination__title';
+    title.textContent = `Combination ${index + 1}`;
+    reactions.className = 'journal-combination__reactions';
+    reactions.textContent =
+      reactionNames.length > 0 ? `Reactions: ${reactionNames.join(', ')}` : 'No reactions required';
+    card.append(
+      title,
+      createCombinationIngredients(combination),
+      createCombinationStats(combination),
+      reactions,
+    );
+    list.append(card);
+  }
+
+  panel.append(list);
+
+  return panel;
+};
+
 const createRecipeDiscoveryGroup = (
   recipes: readonly Recipe[],
-  discoveredIds: readonly string[],
+  discoveries: JournalDiscoveries,
 ): HTMLElement => {
   const section = document.createElement('section');
   const heading = document.createElement('div');
   const title = document.createElement('h3');
   const count = document.createElement('span');
   const grid = document.createElement('div');
-  const discoveries = new Set(discoveredIds);
+  const discoveredIds = new Set(discoveries.recipeIds);
 
   section.className = 'journal-section journal-discoveries';
   heading.className = 'journal-section__heading';
   title.className = 'journal-section__title';
   title.textContent = 'Recipes';
   count.className = 'journal-section__count';
-  count.textContent = `${discoveries.size}/${recipes.length}`;
+  count.textContent = `${discoveredIds.size}/${recipes.length}`;
   grid.className = 'journal-recipe-grid';
 
   for (const recipe of recipes) {
-    const isDiscovered = discoveries.has(recipe.id);
+    const isDiscovered = discoveredIds.has(recipe.id);
     const artworkUrl = getRecipeArtworkUrl(recipe.id);
-    const card = document.createElement('article');
+    const card = document.createElement(isDiscovered ? 'details' : 'article');
+    const summary = document.createElement(isDiscovered ? 'summary' : 'div');
     const artworkFrame = document.createElement('div');
     const details = document.createElement('div');
     const cardHeading = document.createElement('div');
@@ -238,6 +348,7 @@ const createRecipeDiscoveryGroup = (
     card.classList.toggle('journal-recipe--locked', !isDiscovered);
     card.setAttribute('aria-label', isDiscovered ? recipe.name : 'Undiscovered recipe');
     artworkFrame.className = 'journal-recipe__artwork-frame';
+    summary.className = 'journal-recipe__summary';
     details.className = 'journal-recipe__details';
     cardHeading.className = 'journal-recipe__heading';
     name.className = 'journal-recipe__name';
@@ -263,6 +374,8 @@ const createRecipeDiscoveryGroup = (
     if (isDiscovered) {
       const difficulty = document.createElement('span');
       const ranges = document.createElement('div');
+      const toggleHint = document.createElement('span');
+      const combinationCount = discoveries.recipeCombinations[recipe.id]?.length ?? 0;
       const rangeValues: readonly [string, RecipeRange][] = [
         ['T', recipe.temperature],
         ['D', recipe.density],
@@ -272,6 +385,11 @@ const createRecipeDiscoveryGroup = (
       difficulty.className = `journal-recipe__difficulty journal-recipe__difficulty--${recipe.difficulty}`;
       difficulty.textContent = formatLabel(recipe.difficulty);
       ranges.className = 'journal-recipe__ranges';
+      toggleHint.className = 'journal-recipe__toggle-hint';
+      toggleHint.textContent =
+        combinationCount === 0
+          ? 'View recorded combinations'
+          : `View ${combinationCount} ${combinationCount === 1 ? 'combination' : 'combinations'}`;
       cardHeading.append(difficulty);
 
       for (const [label, range] of rangeValues) {
@@ -284,7 +402,7 @@ const createRecipeDiscoveryGroup = (
         ranges.append(rangeElement);
       }
 
-      details.append(cardHeading, ranges);
+      details.append(cardHeading, ranges, toggleHint);
     } else {
       const hint = document.createElement('span');
       hint.className = 'journal-recipe__locked-hint';
@@ -292,7 +410,17 @@ const createRecipeDiscoveryGroup = (
       details.append(cardHeading, hint);
     }
 
-    card.append(artworkFrame, details);
+    summary.append(artworkFrame, details);
+
+    if (isDiscovered) {
+      card.append(
+        summary,
+        createRecipeCombinationPanel(discoveries.recipeCombinations[recipe.id] ?? []),
+      );
+    } else {
+      card.append(summary);
+    }
+
     grid.append(card);
   }
 
@@ -308,7 +436,7 @@ const createDiscoveries = (journal: JournalData): HTMLElement => {
   content.className = 'journal-panel';
   content.append(
     createDiscoveryGroup('Ingredients', INGREDIENTS, journal.discoveries.ingredientIds),
-    createRecipeDiscoveryGroup(RECIPES, journal.discoveries.recipeIds),
+    createRecipeDiscoveryGroup(RECIPES, journal.discoveries),
     createDiscoveryGroup('Reactions', REACTIONS, journal.discoveries.reactionIds),
   );
 
