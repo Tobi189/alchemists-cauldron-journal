@@ -4,6 +4,7 @@ import scoreIconUrl from '../assets/ui/score-emblem.svg';
 import { getDifficultySettings } from '../data/difficulty.ts';
 import type { BrewResult, Difficulty, GameState } from '../types/game.ts';
 import type { LeaderboardEntry } from '../types/leaderboard.ts';
+import type { JournalData } from '../types/journal.ts';
 import { createCauldron } from './cauldron.ts';
 import {
   createClearLeaderboardDialog,
@@ -14,6 +15,7 @@ import {
   createSettingsDialog,
 } from './dialogs.ts';
 import { createGameControls } from './game-controls.ts';
+import { createJournalDialog, type JournalTab } from './journal.ts';
 import { createParameterBars } from './parameter-bars.ts';
 import { createRecipePanel } from './recipe.ts';
 import { createShelf } from './shelf.ts';
@@ -22,7 +24,9 @@ export interface AppHandlers {
   readonly leaderboardEntries: readonly LeaderboardEntry[];
   readonly leaderboardDifficulty: Difficulty;
   readonly leaderboardDialog: 'closed' | 'open' | 'confirm-clear';
-  readonly menuDialog: 'closed' | 'help' | 'settings';
+  readonly menuDialog: 'closed' | 'help' | 'settings' | 'journal';
+  readonly journal: JournalData;
+  readonly journalTab: JournalTab;
   readonly leaderboardNotice: string | undefined;
   readonly brewVisualFeedback: BrewResult | undefined;
   readonly shouldRequestPlayerName: boolean;
@@ -31,6 +35,9 @@ export interface AppHandlers {
   readonly onContinueGame: () => void;
   readonly onPlayAgain: () => void;
   readonly onOpenLeaderboard: () => void;
+  readonly onOpenJournal: () => void;
+  readonly onSelectJournalTab: (tab: JournalTab) => void;
+  readonly onUpdateJournalProfile: (displayName: string) => void;
   readonly onSelectLeaderboardDifficulty: (difficulty: Difficulty) => void;
   readonly onCloseLeaderboard: () => void;
   readonly onRequestClearLeaderboard: () => void;
@@ -54,6 +61,31 @@ const formatTime = (totalSeconds: number): string => {
   const seconds = totalSeconds % 60;
 
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
+const getTimerProgress = (state: GameState): number => {
+  const { startingTimeSeconds } = getDifficultySettings(state.difficulty);
+
+  return Math.max(0, Math.min((state.timeLeft / startingTimeSeconds) * 100, 100));
+};
+
+export const updateTimerHud = (container: HTMLElement, state: GameState): void => {
+  const timer = container.querySelector<HTMLElement>('.hud__timer');
+  const value = timer?.querySelector<HTMLElement>('.hud__value');
+  const progress = timer?.querySelector<HTMLElement>('.hud__timer-progress');
+  const fill = timer?.querySelector<HTMLElement>('.hud__timer-fill');
+
+  if (!timer || !value || !progress || !fill) {
+    return;
+  }
+
+  value.textContent = formatTime(state.timeLeft);
+  progress.setAttribute('aria-valuenow', String(state.timeLeft));
+  fill.style.setProperty('--timer-progress', `${getTimerProgress(state)}%`);
+  timer.classList.toggle(
+    'hud__timer--urgent',
+    state.status === 'playing' && state.timeLeft > 0 && state.timeLeft < 15,
+  );
 };
 
 const createHudItem = (label: string, value: string, iconUrl: string): HTMLElement => {
@@ -82,7 +114,6 @@ const createTimerHud = (state: GameState): HTMLElement => {
   const progress = document.createElement('div');
   const fill = document.createElement('span');
   const rules = getDifficultySettings(state.difficulty);
-  const progressPercentage = (state.timeLeft / rules.startingTimeSeconds) * 100;
 
   timer.className = 'hud__plaque hud__timer';
   progress.className = 'hud__timer-progress';
@@ -92,7 +123,7 @@ const createTimerHud = (state: GameState): HTMLElement => {
   progress.setAttribute('aria-valuemin', '0');
   progress.setAttribute('aria-valuemax', String(rules.startingTimeSeconds));
   progress.setAttribute('aria-valuenow', String(state.timeLeft));
-  fill.style.setProperty('--timer-progress', `${progressPercentage}%`);
+  fill.style.setProperty('--timer-progress', `${getTimerProgress(state)}%`);
 
   if (state.status === 'playing' && state.timeLeft > 0 && state.timeLeft < 15) {
     timer.classList.add('hud__timer--urgent');
@@ -161,11 +192,49 @@ const createHeader = (state: GameState): HTMLElement => {
   return header;
 };
 
+const getFocusedControlKey = (container: HTMLElement): string | undefined => {
+  const activeElement = document.activeElement;
+
+  return activeElement instanceof HTMLElement && container.contains(activeElement)
+    ? activeElement.dataset.focusKey
+    : undefined;
+};
+
+const restoreFocusedControl = (container: HTMLElement, focusKey: string | undefined): void => {
+  if (!focusKey) {
+    return;
+  }
+
+  const controls = container.querySelectorAll<HTMLElement>('[data-focus-key]');
+  const matchingControl = [...controls].find(
+    (control) =>
+      control.dataset.focusKey === focusKey &&
+      (!(control instanceof HTMLButtonElement) || !control.disabled),
+  );
+  const fallbackControl = focusKey.startsWith('ingredient-')
+    ? [...controls].find(
+        (control) =>
+          control.dataset.focusKey === 'brew' &&
+          control instanceof HTMLButtonElement &&
+          !control.disabled,
+      )
+    : undefined;
+
+  (matchingControl ?? fallbackControl)?.focus();
+};
+
 export const renderApp = (
   container: HTMLElement,
   state: GameState,
   handlers: AppHandlers,
 ): void => {
+  const shouldRestoreGameplayFocus =
+    state.status === 'playing' &&
+    handlers.leaderboardDialog === 'closed' &&
+    handlers.menuDialog === 'closed';
+  const focusedControlKey = shouldRestoreGameplayFocus
+    ? getFocusedControlKey(container)
+    : undefined;
   const shell = document.createElement('main');
   const board = document.createElement('div');
   const shelf = createShelf(state, handlers.onAddIngredient);
@@ -180,6 +249,7 @@ export const renderApp = (
     handlers.onBrew,
     handlers.onPourOut,
     handlers.onOpenLeaderboard,
+    handlers.onOpenJournal,
     handlers.onOpenHelp,
     handlers.onOpenSettings,
     handlers.onPause,
@@ -214,6 +284,16 @@ export const renderApp = (
       ? createSettingsDialog(
           state.difficulty,
           handlers.onSelectDifficulty,
+          handlers.onCloseMenuDialog,
+        )
+      : undefined;
+  const journalDialog =
+    handlers.menuDialog === 'journal'
+      ? createJournalDialog(
+          handlers.journal,
+          handlers.journalTab,
+          handlers.onSelectJournalTab,
+          handlers.onUpdateJournalProfile,
           handlers.onCloseMenuDialog,
         )
       : undefined;
@@ -254,5 +334,7 @@ export const renderApp = (
     ...(clearConfirmation ? [clearConfirmation] : []),
     ...(helpDialog ? [helpDialog] : []),
     ...(settingsDialog ? [settingsDialog] : []),
+    ...(journalDialog ? [journalDialog] : []),
   );
+  restoreFocusedControl(container, focusedControlKey);
 };

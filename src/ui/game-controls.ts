@@ -4,6 +4,7 @@ import type { GameState } from '../types/game.ts';
 
 const createActionButton = (
   label: string,
+  focusKey: string,
   className: string,
   onClick: () => void,
 ): HTMLButtonElement => {
@@ -12,6 +13,7 @@ const createActionButton = (
   button.className = className;
   button.type = 'button';
   button.textContent = label;
+  button.dataset.focusKey = focusKey;
   button.addEventListener('click', onClick);
 
   return button;
@@ -59,6 +61,7 @@ export const createGameControls = (
   onBrew: () => void,
   onPourOut: () => void,
   onOpenLeaderboard: () => void,
+  onOpenJournal: () => void,
   onOpenHelp: () => void,
   onOpenSettings: () => void,
   onPause: () => void,
@@ -79,28 +82,49 @@ export const createGameControls = (
     selectedDifficulty.className = 'game-controls__difficulty';
     selectedDifficulty.textContent = `Difficulty: ${state.difficulty[0]?.toUpperCase() ?? ''}${state.difficulty.slice(1)}`;
     leftSlot.append(
-      createActionButton('Top Players', 'secondary-action game-controls__side-action', () => {
-        onOpenLeaderboard();
-      }),
+      createActionButton(
+        'Top Players',
+        'top-players',
+        'secondary-action game-controls__side-action',
+        () => {
+          onOpenLeaderboard();
+        },
+      ),
+      createActionButton(
+        'Journal',
+        'journal',
+        'secondary-action game-controls__side-action',
+        onOpenJournal,
+      ),
     );
     const startActions = document.createElement('div');
     startActions.className = 'game-controls__start-actions';
-    startActions.append(createActionButton('Start Game', 'primary-action', onStartGame));
+    startActions.append(
+      createActionButton('Start Game', 'start-game', 'primary-action', onStartGame),
+    );
 
     if (hasSavedGame) {
-      startActions.append(createActionButton('Continue Game', 'secondary-action', onContinueGame));
+      startActions.append(
+        createActionButton('Continue Game', 'continue-game', 'secondary-action', onContinueGame),
+      );
     }
 
     centerSlot.append(startActions, selectedDifficulty);
     rightSlot.append(
-      createActionButton('Help', 'secondary-action game-controls__side-action', onOpenHelp),
-      createActionButton('Settings', 'secondary-action game-controls__side-action', onOpenSettings),
+      createActionButton('Help', 'help', 'secondary-action game-controls__side-action', onOpenHelp),
+      createActionButton(
+        'Settings',
+        'settings',
+        'secondary-action game-controls__side-action',
+        onOpenSettings,
+      ),
     );
   } else {
     const playActions = document.createElement('div');
-    const brewButton = createActionButton('Brew', 'primary-action', onBrew);
+    const brewButton = createActionButton('Brew', 'brew', 'primary-action', onBrew);
     const pourOutButton = createActionButton(
       'Pour Out −10s',
+      'pour-out',
       'secondary-action game-controls__pour-out',
       onPourOut,
     );
@@ -118,6 +142,7 @@ export const createGameControls = (
     if (state.status === 'playing') {
       const pauseButton = createActionButton(
         'Pause',
+        'pause',
         'secondary-action game-controls__side-action',
         onPause,
       );

@@ -1,4 +1,4 @@
-# Alchemist's Cauldron
+# Alchemist's Cauldron: Journal Edition
 
 Alchemist's Cauldron is a browser-based potion-brewing game developed for the
 [RS School JavaScript/Front-end Short Track](https://rs.school/docs/short-track/course-overview).
@@ -9,13 +9,29 @@ target ranges before time, lives or ingredient stock runs out.
 ## Task
 
 - [Official task requirements](https://github.com/rolling-scopes-school/qualifying-stage/blob/main/tasks/game-alchemists-cauldron/README.md)
+- [Creative extension requirements](https://github.com/rolling-scopes-school/qualifying-stage/blob/main/tasks/creative-extension/mini-games.md)
 - Target score: **393 points**
 - Supported browser: latest Google Chrome
 - Supported viewport width: **375px–1920px**
 
 ## Deployment
 
-[Open the deployed application](https://tobi189.github.io/alchemists-cauldron/)
+[Open the deployed application](https://tobi189.github.io/alchemists-cauldron-journal/)
+
+## Creative extension: Alchemist's Journal
+
+The Journal turns individual game rounds into persistent player progression. It records completed
+and abandoned experiments in `localStorage`, then presents the accumulated data through four
+sections available from the main menu:
+
+- **Overview** — editable alchemist name and career statistics;
+- **Discoveries** — ingredients used, recipes completed and reactions triggered;
+- **Achievements** — ten unlockable milestones evaluated from recorded progress;
+- **History** — chronological session results with difficulty, outcome, score and brew statistics.
+
+Journal data is validated before it is loaded. The active journal session is also included in saved
+games, so continuing a paused game does not lose its discoveries or statistics. Older version 2
+game saves remain compatible and receive a new journal session automatically.
 
 ## Current implementation
 
@@ -107,9 +123,13 @@ src/
   state/
   storage/
   styles/
+    abstracts/
+    base/
+    components/
+    layout/
     main.scss
+  types/
   ui/
-    app.ts
   main.ts
 index.html
 ```
@@ -134,8 +154,8 @@ Requirements:
 Clone the repository and install dependencies:
 
 ```bash
-git clone git@github.com:Tobi189/alchemists-cauldron.git
-cd alchemists-cauldron
+git clone git@github.com:Tobi189/alchemists-cauldron-journal.git
+cd alchemists-cauldron-journal
 npm install
 ```
 

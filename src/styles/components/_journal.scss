@@ -1,0 +1,740 @@
+@use '../abstracts/tokens' as *;
+
+.journal-dialog {
+  width: min(100%, 68rem);
+  padding: clamp(1.2rem, 3vw, 2.25rem);
+  text-align: left;
+}
+
+.journal-dialog__title {
+  color: $gold-light;
+  font-size: clamp(2rem, 6vw, 4rem);
+  text-align: center;
+  text-shadow: 0 0 1.2rem rgba($gold, 0.38);
+}
+
+.journal-dialog > .game-over-dialog__eyebrow {
+  text-align: center;
+}
+
+.journal-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 1.4rem 0 1rem;
+  padding: 0.35rem;
+  border: 1px solid rgba($gold, 0.35);
+  border-radius: 0.55rem;
+  background: rgba(#020402, 0.56);
+}
+
+.journal-tabs__button {
+  min-height: 2.65rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid transparent;
+  border-radius: 0.38rem;
+  color: $muted-ink;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: transparent;
+
+  &:hover,
+  &:focus-visible {
+    outline: none;
+    border-color: rgba($gold-light, 0.65);
+    color: $gold-light;
+  }
+}
+
+.journal-tabs__button--selected {
+  border-color: rgba($magic, 0.7);
+  color: #071008;
+  background: linear-gradient(180deg, $magic, #6cae4e);
+  box-shadow: 0 0 0.7rem rgba($magic, 0.25);
+}
+
+.journal-panel {
+  min-height: 22rem;
+  padding: clamp(0.8rem, 2vw, 1.25rem);
+  border: 1px solid rgba($gold, 0.25);
+  border-radius: 0.55rem;
+  background:
+    linear-gradient(rgba(#0d130e, 0.92), rgba(#060906, 0.96)),
+    repeating-linear-gradient(135deg, transparent 0 1.5rem, rgba($gold, 0.03) 1.5rem 3rem);
+  box-shadow: inset 0 0 1.6rem rgba(#000, 0.42);
+}
+
+.journal-panel__introduction {
+  margin: 0 0 1.2rem;
+  color: $muted-ink;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.journal-section + .journal-section {
+  margin-top: 1.25rem;
+}
+
+.journal-section__heading {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.journal-section__title {
+  margin: 0 0 0.7rem;
+  color: $gold-light;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.journal-section__count {
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgba($magic, 0.38);
+  border-radius: 999px;
+  color: $magic;
+  font-size: 0.74rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.journal-profile {
+  padding: 1rem;
+  border: 1px solid rgba($gold, 0.25);
+  border-radius: 0.45rem;
+  background: rgba(#020402, 0.42);
+}
+
+.journal-profile__form {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.journal-profile__label {
+  color: $muted-ink;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.journal-profile__row {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.journal-profile__input {
+  width: 100%;
+  min-height: 2.8rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba($gold-light, 0.58);
+  border-radius: 0.32rem;
+  outline: none;
+  color: $ink;
+  background: rgba(#020402, 0.8);
+
+  &:focus {
+    border-color: $magic;
+    box-shadow: 0 0 0 2px rgba($magic, 0.22);
+  }
+
+  &[aria-invalid='true'] {
+    border-color: #ff8069;
+  }
+}
+
+.journal-profile__submit {
+  min-width: 8rem;
+}
+
+.journal-profile__error {
+  min-height: 1rem;
+  margin: 0;
+  color: #ff8069;
+  font-size: 0.76rem;
+}
+
+.journal-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.journal-stat {
+  display: grid;
+  gap: 0.25rem;
+  min-height: 5.2rem;
+  padding: 0.8rem 0.55rem;
+  border: 1px solid rgba($gold, 0.3);
+  border-radius: 0.4rem;
+  place-content: center;
+  text-align: center;
+  background: rgba(#030604, 0.62);
+}
+
+.journal-stat__value {
+  color: $magic;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-variant-numeric: tabular-nums;
+}
+
+.journal-stat__label {
+  color: $muted-ink;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.journal-discovery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: 0.55rem;
+}
+
+.journal-discovery {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr);
+  gap: 0.55rem;
+  align-items: center;
+  min-height: 3.4rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba($magic, 0.32);
+  border-radius: 0.38rem;
+  background: rgba($magic, 0.06);
+}
+
+.journal-discovery--locked {
+  border-color: rgba($muted-ink, 0.2);
+  filter: grayscale(1);
+  opacity: 0.54;
+  background: rgba(#020402, 0.48);
+}
+
+.journal-discovery__icon {
+  width: 2.35rem;
+  height: 2.35rem;
+  object-fit: contain;
+}
+
+.journal-discovery__sigil {
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1px solid rgba($gold-light, 0.55);
+  border-radius: 50%;
+  color: $gold-light;
+  place-items: center;
+}
+
+.journal-discovery__name {
+  color: $ink;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.journal-recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.journal-recipe {
+  align-self: start;
+  overflow: hidden;
+  border: 1px solid rgba($gold-light, 0.48);
+  border-radius: 0.5rem;
+  background:
+    radial-gradient(circle at 50% 25%, rgba($arcane, 0.14), transparent 48%),
+    linear-gradient(160deg, rgba(#191326, 0.95), rgba(#050806, 0.98));
+  box-shadow:
+    inset 0 0 0 2px rgba(#000, 0.45),
+    0 0.45rem 0.8rem rgba(#000, 0.35);
+}
+
+.journal-recipe[open] {
+  grid-column: 1 / -1;
+  border-color: rgba($gold-light, 0.72);
+  box-shadow:
+    inset 0 0 0 2px rgba(#000, 0.45),
+    0 0 1rem rgba($gold, 0.16);
+}
+
+.journal-recipe__summary {
+  display: block;
+  list-style: none;
+  cursor: pointer;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $gold-light;
+    outline-offset: -0.2rem;
+  }
+}
+
+.journal-recipe[open] > .journal-recipe__summary {
+  display: grid;
+  grid-template-columns: minmax(11rem, 0.42fr) minmax(15rem, 1fr);
+  align-items: stretch;
+}
+
+.journal-recipe__artwork-frame {
+  display: grid;
+  min-height: 9rem;
+  padding: 0.65rem 0.65rem 0;
+  overflow: hidden;
+  place-items: center;
+  border-bottom: 1px solid rgba($gold, 0.26);
+  background: radial-gradient(circle, rgba($gold, 0.08), transparent 68%);
+}
+
+.journal-recipe__artwork {
+  display: block;
+  width: 100%;
+  height: 8.5rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0.4rem 0.55rem rgba(#000, 0.72)) drop-shadow(0 0 0.5rem rgba($arcane, 0.24));
+}
+
+.journal-recipe__placeholder {
+  display: grid;
+  width: 4.5rem;
+  aspect-ratio: 1;
+  border: 1px solid rgba($gold-light, 0.55);
+  border-radius: 50%;
+  color: $gold-light;
+  font-size: 2rem;
+  place-items: center;
+}
+
+.journal-recipe__details {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.65rem 0.75rem 0.75rem;
+}
+
+.journal-recipe__heading {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.journal-recipe__name {
+  min-width: 0;
+  overflow: hidden;
+  color: #f3e3b2;
+  font-size: 0.86rem;
+  letter-spacing: 0.035em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.journal-recipe__difficulty {
+  flex: none;
+  padding: 0.13rem 0.35rem;
+  border: 1px solid currentcolor;
+  border-radius: 999px;
+  color: $arcane;
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.journal-recipe__difficulty--easy {
+  color: $density;
+}
+
+.journal-recipe__difficulty--hard {
+  color: #ff8069;
+}
+
+.journal-recipe__ranges {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.25rem;
+
+  span {
+    padding: 0.22rem 0.18rem;
+    border: 1px solid rgba($gold, 0.24);
+    border-radius: 0.22rem;
+    color: $muted-ink;
+    font-size: 0.64rem;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    background: rgba(#020402, 0.56);
+  }
+
+  abbr {
+    color: $gold-light;
+    text-decoration: none;
+  }
+}
+
+.journal-recipe--locked {
+  border-color: rgba($muted-ink, 0.2);
+  background: rgba(#020402, 0.58);
+
+  .journal-recipe__artwork {
+    filter: grayscale(1) brightness(0.13) contrast(1.35);
+    opacity: 0.68;
+  }
+
+  .journal-recipe__name {
+    color: $muted-ink;
+  }
+}
+
+.journal-recipe__locked-hint {
+  color: rgba($muted-ink, 0.68);
+  font-size: 0.68rem;
+  font-style: italic;
+}
+
+.journal-recipe__toggle-hint {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: flex-end;
+  color: $gold-light;
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+
+  &::after {
+    content: '⌄';
+    font-size: 1rem;
+    line-height: 0.7;
+    transition: transform 150ms ease;
+  }
+}
+
+.journal-recipe[open] .journal-recipe__toggle-hint::after {
+  transform: rotate(180deg);
+}
+
+.journal-recipe__combination-panel {
+  padding: 0.85rem;
+  border-top: 1px solid rgba($gold-light, 0.38);
+  background:
+    linear-gradient(rgba(#050806, 0.88), rgba(#020402, 0.96)),
+    repeating-linear-gradient(135deg, transparent 0 1rem, rgba($gold, 0.025) 1rem 2rem);
+}
+
+.journal-recipe__combination-title {
+  margin: 0 0 0.65rem;
+  color: $gold-light;
+  font-size: 0.84rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.journal-recipe__combination-empty {
+  margin: 0;
+  color: $muted-ink;
+  font-size: 0.78rem;
+  font-style: italic;
+}
+
+.journal-recipe__combination-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.journal-combination {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.7rem;
+  border: 1px solid rgba($gold, 0.3);
+  border-radius: 0.38rem;
+  background: rgba(#050706, 0.72);
+}
+
+.journal-combination__title {
+  margin: 0;
+  color: #f3e3b2;
+  font-size: 0.76rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.journal-combination__ingredients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.journal-combination__ingredient {
+  display: inline-flex;
+  gap: 0.28rem;
+  align-items: center;
+  padding: 0.2rem 0.38rem 0.2rem 0.22rem;
+  border: 1px solid rgba($magic, 0.28);
+  border-radius: 999px;
+  color: $ink;
+  font-size: 0.66rem;
+  background: rgba($magic, 0.06);
+
+  img {
+    width: 1.35rem;
+    height: 1.35rem;
+    object-fit: contain;
+  }
+}
+
+.journal-combination__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.3rem;
+
+  span {
+    padding: 0.24rem;
+    border: 1px solid rgba($gold, 0.24);
+    border-radius: 0.22rem;
+    color: $muted-ink;
+    font-size: 0.67rem;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  abbr {
+    color: $gold-light;
+    text-decoration: none;
+  }
+}
+
+.journal-combination__reactions {
+  margin: 0;
+  color: rgba($muted-ink, 0.82);
+  font-size: 0.66rem;
+  font-style: italic;
+}
+
+.journal-achievements {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.journal-achievement {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: 0.75rem;
+  min-height: 7rem;
+  padding: 0.85rem;
+  border: 1px solid rgba($gold-light, 0.5);
+  border-radius: 0.5rem;
+  background:
+    radial-gradient(circle at 0 0, rgba($gold, 0.12), transparent 55%), rgba(#050806, 0.72);
+}
+
+.journal-achievement--locked {
+  border-color: rgba($muted-ink, 0.2);
+  opacity: 0.58;
+}
+
+.journal-achievement__emblem {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid rgba($gold-light, 0.65);
+  border-radius: 50%;
+  color: $gold-light;
+  font-size: 1.45rem;
+  place-items: center;
+  box-shadow: inset 0 0 0.8rem rgba($gold, 0.18);
+}
+
+.journal-achievement__title {
+  margin: 0;
+  color: $gold-light;
+  font-size: 1rem;
+}
+
+.journal-achievement__description,
+.journal-achievement__date {
+  margin: 0.35rem 0 0;
+  color: $muted-ink;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.journal-achievement__date {
+  color: $magic;
+  font-size: 0.7rem;
+}
+
+.journal-history {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.journal-session {
+  display: grid;
+  grid-template-columns: minmax(11rem, 1fr) auto;
+  gap: 0.55rem 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba($gold, 0.3);
+  border-radius: 0.45rem;
+  background: rgba(#020402, 0.52);
+}
+
+.journal-session__heading {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.journal-session__difficulty {
+  padding: 0.2rem 0.55rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: $gold-light;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.journal-session__difficulty--easy {
+  color: $magic;
+}
+
+.journal-session__difficulty--hard {
+  color: #ff8069;
+}
+
+.journal-session__date {
+  color: $muted-ink;
+  font-size: 0.76rem;
+}
+
+.journal-session__score {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  color: $magic;
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: right;
+}
+
+.journal-session__details {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0;
+
+  div {
+    display: contents;
+  }
+
+  dt,
+  dd {
+    margin: 0;
+  }
+
+  dt {
+    grid-row: 1;
+    color: $muted-ink;
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    grid-row: 2;
+    color: $ink;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.journal-empty {
+  margin: 7rem auto;
+  color: $muted-ink;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .journal-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .journal-stats,
+  .journal-achievements {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 500px) {
+  .journal-dialog {
+    padding: 1rem 0.6rem;
+  }
+
+  .journal-profile__row,
+  .journal-session__heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .journal-profile__submit {
+    min-height: 2.8rem;
+  }
+
+  .journal-achievements {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .journal-recipe-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .journal-recipe[open] > .journal-recipe__summary,
+  .journal-recipe__combination-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .journal-achievement {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+  }
+
+  .journal-achievement__emblem {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .journal-session {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .journal-session__score {
+    grid-column: 1;
+    grid-row: 2;
+    text-align: left;
+  }
+
+  .journal-session__details {
+    grid-row: 3;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    dt,
+    dd {
+      grid-row: auto;
+    }
+
+    dt {
+      align-self: end;
+    }
+  }
+}

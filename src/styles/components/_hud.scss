@@ -1,0 +1,211 @@
+@use '../abstracts/tokens' as *;
+
+.hud__plaque {
+  position: relative;
+  min-width: 0;
+  min-height: clamp(5.6rem, 7vw, 7.5rem);
+  isolation: isolate;
+
+  &::before,
+  &::after {
+    position: absolute;
+    content: '';
+    pointer-events: none;
+  }
+
+  &::before {
+    z-index: -2;
+    inset: 0;
+  }
+
+  &::after {
+    z-index: -1;
+    inset: 19% 10%;
+    border-radius: 50%;
+    box-shadow: 0 0 1.8rem rgba($magic, 0.08);
+  }
+}
+
+.game-header__title-group {
+  position: relative;
+  z-index: 4;
+  width: min(64%, 61rem);
+  min-width: 0;
+  min-height: clamp(4.7rem, 7vw, 7.3rem);
+  padding: clamp(0.75rem, 1.35vw, 1.15rem) clamp(2.2rem, 5vw, 5rem) clamp(1rem, 1.7vw, 1.45rem);
+  margin: clamp(-1.45rem, -1.6vw, -0.85rem) auto 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  background:
+    url('../../assets/ui/hud-title-frame.png') center / 100% 100% no-repeat,
+    radial-gradient(ellipse at 50% 45%, rgba($magic, 0.11), transparent 62%);
+  filter: drop-shadow(0 0.8rem 0.7rem rgba(#000, 0.7));
+}
+
+.game-header__title {
+  margin: 0;
+  color: #e4ffc0;
+  font-size: clamp(1.4rem, 2.7vw, 3.1rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow:
+    0 1px #111,
+    0 0 0.3rem rgba($magic, 0.9),
+    0 0 1.4rem rgba($magic, 0.5),
+    0 2px #19320d;
+}
+
+.hud__item {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: clamp(0.3rem, 0.8vw, 0.65rem);
+  align-items: center;
+  white-space: nowrap;
+}
+
+.hud__icon {
+  width: clamp(2.25rem, 4vw, 3.9rem);
+  aspect-ratio: 1;
+  filter: drop-shadow(0 0.25rem 0.4rem rgba(#000, 0.72));
+}
+
+.hud__label {
+  color: $gold-light;
+  font-size: clamp(0.78rem, 1.5vw, 1.28rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 2px #000;
+}
+
+.hud__value {
+  color: $magic;
+  font-size: clamp(1.2rem, 2.5vw, 2.25rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 0.75rem rgba($magic, 0.42);
+}
+
+.hud__score {
+  z-index: 1;
+  min-height: clamp(5.6rem, 7vw, 7.5rem);
+  padding: clamp(0.9rem, 1.4vw, 1.35rem) clamp(2rem, 4.2vw, 4.5rem) clamp(0.9rem, 1.4vw, 1.35rem)
+    clamp(2.1rem, 4vw, 4rem);
+  justify-self: start;
+  width: 100%;
+  filter: drop-shadow(0 0.65rem 0.55rem rgba(#000, 0.72));
+
+  &::before {
+    background: url('../../assets/ui/hud-side-frame.png') center / 100% 100% no-repeat;
+  }
+}
+
+.hud__timer {
+  z-index: 3;
+  display: grid;
+  gap: 0.3rem;
+  align-content: center;
+  justify-self: center;
+  width: calc(100% + clamp(2rem, 4vw, 4.5rem));
+  min-width: 18rem;
+  padding: clamp(0.85rem, 1.25vw, 1.25rem) clamp(3.2rem, 5vw, 5rem);
+  filter: drop-shadow(0 0.75rem 0.6rem rgba(#000, 0.78));
+
+  &::before {
+    background: url('../../assets/ui/hud-timer-frame.png') center / 100% 100% no-repeat;
+  }
+
+  .hud__item {
+    justify-content: center;
+  }
+}
+
+.hud__timer-progress {
+  width: calc(100% - clamp(2.55rem, 4vw, 4.2rem));
+  height: 0.38rem;
+  margin-left: auto;
+  overflow: hidden;
+  border: 1px solid rgba($gold, 0.62);
+  border-radius: 999px;
+  background: rgba(#000, 0.72);
+}
+
+.hud__timer-fill {
+  display: block;
+  width: var(--timer-progress);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #4e8f20, $magic);
+  box-shadow: 0 0 0.5rem rgba($magic, 0.65);
+  transition: width 250ms linear;
+}
+
+.hud__timer--urgent {
+  .hud__value {
+    color: #ff5f4e;
+  }
+
+  .hud__timer-fill {
+    background: #e73e2f;
+    box-shadow: 0 0 0.65rem rgba(#ff3d2d, 0.85);
+  }
+
+  animation: urgent-timer-pulse 800ms ease-in-out infinite alternate;
+}
+
+@keyframes urgent-timer-pulse {
+  from {
+    filter: brightness(1);
+  }
+
+  to {
+    filter: brightness(1.45);
+  }
+}
+
+.hud__lives {
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  width: 100%;
+  min-width: 0;
+  min-height: clamp(5.6rem, 7vw, 7.5rem);
+  padding: clamp(0.9rem, 1.4vw, 1.35rem) clamp(2.1rem, 4vw, 4rem) clamp(0.9rem, 1.4vw, 1.35rem)
+    clamp(2rem, 4.2vw, 4.5rem);
+  justify-self: end;
+  text-align: right;
+  filter: drop-shadow(0 0.65rem 0.55rem rgba(#000, 0.72));
+
+  &::before {
+    background: url('../../assets/ui/hud-side-frame.png') center / 100% 100% no-repeat;
+    transform: scaleX(-1);
+  }
+}
+
+.hud__lives--empty {
+  grid-template-columns: auto auto;
+  gap: clamp(0.3rem, 0.8vw, 0.65rem);
+  align-items: center;
+  justify-content: end;
+  min-height: clamp(5.6rem, 7vw, 7.5rem);
+}
+
+.hud__value--dormant {
+  color: $muted-ink;
+  text-shadow: 0 0 0.5rem rgba($gold, 0.25);
+}
+
+.hud__hearts {
+  display: flex;
+  gap: clamp(0.15rem, 0.6vw, 0.45rem);
+  justify-content: center;
+}
+
+.hud__heart {
+  width: clamp(1.8rem, 3.5vw, 3.25rem);
+  aspect-ratio: 1;
+  filter: drop-shadow(0 0.2rem 0.35rem rgba(#000, 0.8));
+}

@@ -2,18 +2,24 @@ import './styles/main.scss';
 import { DEFAULT_DIFFICULTY } from './data/difficulty.ts';
 import { INGREDIENTS } from './data/ingredients.ts';
 import { addIngredient } from './logic/add-ingredient.ts';
+import { unlockJournalAchievements } from './logic/achievements.ts';
 import { brewPotion } from './logic/brew-check.ts';
 import { finishGameIfNeeded } from './logic/game-over.ts';
 import { addLeaderboardEntry, isTopTenScore } from './logic/leaderboard.ts';
 import { pauseGame, resumeGame } from './logic/pause.ts';
 import { pourOutCauldron } from './logic/pour-out.ts';
+import { finalizeJournalSession } from './logic/journal-session.ts';
+import { updateJournalProfile } from './logic/journal.ts';
 import { syncTimer } from './logic/timer.ts';
 import { createMenuState, createNewGameState } from './state/game-state.ts';
 import { didClearLeaderboard, didSaveLeaderboard, loadLeaderboard } from './storage/leaderboard.ts';
 import { didClearSavedGame, didSaveGame, loadGame } from './storage/save.ts';
+import { didSaveJournal, loadJournal } from './storage/journal.ts';
 import type { BrewResult, Difficulty, GameState } from './types/game.ts';
 import type { LeaderboardEntry } from './types/leaderboard.ts';
-import { renderApp } from './ui/app.ts';
+import type { SessionOutcome } from './types/journal.ts';
+import { renderApp, updateTimerHud } from './ui/app.ts';
+import type { JournalTab } from './ui/journal.ts';
 import { getGameShortcut } from './ui/keyboard-shortcuts.ts';
 
 const app = document.querySelector<HTMLDivElement>('#app');
@@ -32,10 +38,30 @@ const startApp = (container: HTMLElement): void => {
   };
   let leaderboardDifficulty: Difficulty = DEFAULT_DIFFICULTY;
   let leaderboardDialog: 'closed' | 'open' | 'confirm-clear' = 'closed';
-  let menuDialog: 'closed' | 'help' | 'settings' = 'closed';
+  let menuDialog: 'closed' | 'help' | 'settings' | 'journal' = 'closed';
+  let journal = loadJournal();
+  let journalTab: JournalTab = 'overview';
   let leaderboardNotice: string | undefined;
   let hasHandledCurrentResult = false;
   let brewVisualFeedback: BrewResult | undefined;
+
+  const finalizeCurrentJournalSession = (outcome: SessionOutcome): void => {
+    const finalizedJournal = finalizeJournalSession(
+      journal,
+      gameState.journalSession,
+      gameState.difficulty,
+      gameState.score,
+      outcome,
+    );
+    const nextJournal = unlockJournalAchievements(finalizedJournal);
+
+    if (nextJournal === journal) {
+      return;
+    }
+
+    journal = nextJournal;
+    didSaveJournal(journal);
+  };
 
   const persistCurrentGame = (): void => {
     if (gameState.status === 'playing' || gameState.status === 'paused') {
@@ -57,6 +83,10 @@ const startApp = (container: HTMLElement): void => {
 
     if (gameState.status !== 'game-over') {
       return;
+    }
+
+    if (gameState.gameOverReason) {
+      finalizeCurrentJournalSession(gameState.gameOverReason);
     }
 
     didClearSavedGame();
@@ -162,6 +192,8 @@ const startApp = (container: HTMLElement): void => {
       leaderboardDifficulty,
       leaderboardDialog,
       menuDialog,
+      journal,
+      journalTab,
       leaderboardNotice,
       brewVisualFeedback,
       shouldRequestPlayerName:
@@ -177,6 +209,26 @@ const startApp = (container: HTMLElement): void => {
         leaderboardDialog = 'open';
         menuDialog = 'closed';
         leaderboardNotice = undefined;
+        render();
+      },
+      onOpenJournal: () => {
+        menuDialog = 'journal';
+        leaderboardDialog = 'closed';
+        journalTab = 'overview';
+        render();
+      },
+      onSelectJournalTab: (tab) => {
+        journalTab = tab;
+        render();
+      },
+      onUpdateJournalProfile: (displayName) => {
+        const nextJournal = updateJournalProfile(journal, displayName);
+
+        if (nextJournal !== journal) {
+          journal = nextJournal;
+          didSaveJournal(journal);
+        }
+
         render();
       },
       onSelectLeaderboardDifficulty: (difficulty) => {
@@ -249,6 +301,7 @@ const startApp = (container: HTMLElement): void => {
       onPause: pauseCurrentGame,
       onResume: resumeCurrentGame,
       onExitToMenu: () => {
+        finalizeCurrentJournalSession('abandoned');
         gameState = createMenuState(gameState.difficulty);
         didClearSavedGame();
         continuableGame = undefined;
@@ -325,9 +378,16 @@ const startApp = (container: HTMLElement): void => {
       return;
     }
 
+    const shouldRenderEntireApp = nextState.status !== gameState.status;
+
     gameState = nextState;
     persistCurrentGame();
-    render();
+
+    if (shouldRenderEntireApp) {
+      render();
+    } else {
+      updateTimerHud(container, gameState);
+    }
   }, 250);
 
   globalThis.addEventListener('pagehide', () => {
