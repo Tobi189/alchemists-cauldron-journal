@@ -20,12 +20,12 @@
     z-index: -3;
     width: 88%;
     aspect-ratio: 1;
-    border: 1px solid rgba($gold, 0.16);
+    border: 1px solid rgba($gold, 0.25);
     border-radius: 50%;
     content: '';
     background:
-      radial-gradient(circle, transparent 0 41%, rgba($magic, 0.08) 42% 43%, transparent 44%),
-      repeating-conic-gradient(from 22deg, rgba($gold, 0.15) 0 1deg, transparent 1deg 30deg);
+      radial-gradient(circle, transparent 0 41%, rgba($magic, 0.11) 42% 43%, transparent 44%),
+      repeating-conic-gradient(from 22deg, rgba($gold, 0.2) 0 1deg, transparent 1deg 30deg);
     mask: radial-gradient(circle, transparent 0 48%, #000 49% 58%, transparent 59%);
   }
 
@@ -83,8 +83,8 @@
   aspect-ratio: 1;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 50% 42%, rgba(#d7ff75, 0.2), rgba($magic, 0.09) 38%, transparent 68%),
-    radial-gradient(ellipse at 50% 76%, rgba($magic, 0.2), transparent 45%);
+    radial-gradient(circle at 50% 42%, rgba(#d7ff75, 0.24), rgba($magic, 0.1) 38%, transparent 68%),
+    radial-gradient(ellipse at 50% 76%, rgba($magic, 0.25), transparent 45%);
   filter: blur(0.75rem);
 }
 
@@ -101,7 +101,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 1.5rem 1.1rem rgba(#000, 0.9));
+  filter: drop-shadow(0 1.5rem 1.1rem rgba(#000, 0.9)) contrast(1.04) brightness(1.03);
   pointer-events: none;
   transition: filter 180ms ease;
 }
@@ -109,12 +109,12 @@
 .cauldron__rim {
   position: absolute;
   z-index: 4;
-  top: 9.5%;
-  left: 17.5%;
+  top: 10.25%;
+  left: 16.5%;
   display: grid;
-  width: 65%;
-  aspect-ratio: 3.55;
-  padding: clamp(0.2rem, 0.45vw, 0.4rem);
+  width: 67%;
+  aspect-ratio: 4.18;
+  padding: clamp(0.16rem, 0.35vw, 0.3rem);
   place-items: center;
   border-radius: 50%;
   transition: filter 180ms ease;
@@ -127,7 +127,7 @@
   height: 100%;
   overflow: hidden;
   place-items: center;
-  border: 1px solid rgba(#e8ff9c, 0.7);
+  border: 2px solid rgba(#e8ff9c, 0.72);
   border-radius: 50%;
   background:
     radial-gradient(circle at 24% 37%, rgba(#eaff9b, 0.82) 0 0.18rem, transparent 0.23rem),
@@ -136,9 +136,23 @@
     radial-gradient(ellipse at 50% 25%, rgba(#efffb0, 0.7), transparent 35%),
     radial-gradient(ellipse, #98d837, #3c771e 48%, #142d10 76%);
   box-shadow:
+    inset 0 0 0 2px rgba(#16360e, 0.5),
     inset 0 0 1.2rem rgba(#efffa3, 0.48),
     inset 0 -1rem 1.5rem rgba(#0d2a0b, 0.72),
     0 0 1.7rem rgba($magic, 0.45);
+
+  &::before {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    content: '';
+    background:
+      radial-gradient(circle at 18% 66%, rgba(#edffae, 0.78) 0 0.13rem, transparent 0.2rem),
+      radial-gradient(circle at 82% 36%, rgba(#dfff8c, 0.66) 0 0.19rem, transparent 0.26rem),
+      radial-gradient(circle at 64% 72%, rgba(#f2ffbd, 0.5) 0 0.11rem, transparent 0.18rem);
+    opacity: 0.82;
+    pointer-events: none;
+  }
 
   &::after {
     position: absolute;
@@ -152,28 +166,6 @@
   }
 }
 
-.cauldron__body {
-  position: absolute;
-  z-index: 3;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-}
-
-.cauldron__emblem {
-  position: absolute;
-  top: 58%;
-  left: 50%;
-  z-index: 1;
-  display: block;
-  width: clamp(4.6rem, 9.5vw, 7rem);
-  aspect-ratio: 1;
-  object-fit: contain;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 0 0.55rem rgba($magic, 0.8)) drop-shadow(0 0 1.3rem rgba($magic, 0.48));
-}
-
 .cauldron__contents {
   position: relative;
   z-index: 2;
@@ -181,8 +173,8 @@
   gap: clamp(0.35rem, 1vw, 0.75rem);
   align-items: center;
   justify-content: center;
-  width: 100%;
-  min-height: 3.3rem;
+  width: 94%;
+  min-height: 2.8rem;
 }
 
 .cauldron__empty-message {
@@ -355,10 +347,6 @@
   .cauldron__liquid {
     animation: cauldron-success-liquid 820ms ease-out both;
   }
-
-  .cauldron__emblem {
-    animation: cauldron-success-emblem 850ms ease-out both;
-  }
 }
 
 .cauldron-stage--brew-failure {
@@ -488,13 +476,13 @@
   0%,
   100% {
     transform: translateY(0);
-    filter: drop-shadow(0 1.5rem 1.1rem rgba(#000, 0.9));
+    filter: drop-shadow(0 1.5rem 1.1rem rgba(#000, 0.9)) contrast(1.04) brightness(1.03);
   }
 
   38% {
     transform: translateY(-0.55rem) scale(1.015);
     filter: drop-shadow(0 1.5rem 1.1rem rgba(#000, 0.9)) drop-shadow(0 0 1.6rem rgba($magic, 0.72))
-      brightness(1.15);
+      contrast(1.04) brightness(1.15);
   }
 }
 
@@ -506,17 +494,6 @@
 
   36% {
     filter: brightness(1.85) saturate(1.35);
-  }
-}
-
-@keyframes cauldron-success-emblem {
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-
-  42% {
-    transform: translate(-50%, -50%) scale(1.18) rotate(8deg);
   }
 }
 
@@ -573,7 +550,6 @@
   .game-shell--brew-failure,
   .cauldron-stage--brew-success .cauldron__artwork,
   .cauldron-stage--brew-success .cauldron__liquid,
-  .cauldron-stage--brew-success .cauldron__emblem,
   .cauldron-stage--brew-failure .cauldron__artwork,
   .cauldron-stage--brew-failure .cauldron__rim,
   .cauldron-stage--brew-failure .cauldron__liquid,
